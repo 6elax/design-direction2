@@ -183,3 +183,31 @@ It defines the narrowest wedge (MVP) focused on parsing local files (`product-th
 ### What shifted
 - **Transcript Streamlining:** Designed automated summarization to isolate key decisions/fixes (Pivot Moments) and collapse verbose chat transcripts.
 - **Progressive Synthesis:** Created a tiered information delivery model where simple case studies scale up into consolidated troubleshooting wikis as more data is collected.
+
+---
+
+## Cycle 8: System Integration Touchpoints & Non-Coding Use-Case Walkthroughs
+
+### AI Critique/Query
+1. ❓ **Integration & Sync Mechanics**: Clarified where the tool displays suggestions (sidebar, tooltips, CLI) and how it syncs logs (Git hidden folders, workspace SSO).
+2. ❓ **Non-Coding Applicability**: Brainstormed how the same metacognitive scaffolding patterns apply to Figma layout design, literature reviews, and positionality statement validation gates.
+
+### User Response
+> so the tool you're imagining connects to both the code/code editor, and the agent chat on the side? when it detects the user may be having difficulty, where does it print/show its output? also lastly, how does a user connect to their organization for this tool? since this tool will only show previous chat logs for people from the organization, rather than the entire database
+> 
+> other questions: does this tool have other uses other than for coding? like if there is some collaborative feature it can be used for in agent chatting or planning or making new and more skills, etc
+> 
+> can you add your responses 1, 2, 3 to product-thesis.md?
+> also I want you to give concrete examples of the 3 "concrete examples" of a realistic chat, what the user's problem is (make sure it is realistic), what the user sees, what they ask, what this tool outputs for the user, and how exactly it helps the user and allows the user to become unstuck.
+
+### Document Delta
+| Field | Before | After |
+|---|---|---|
+| System Integration & Boundaries | Undefined | Added section detailing SQLite database watching, VS Code sidebar/hover tooltips, and Git/SSO data boundaries |
+| Scenario E | Undefined | Added Figma layout design agent dialogue (Auto-Layout positioning solution) |
+| Scenario F | Undefined | Added literature review agent citation hallucination dialogue (Bibliography reference constraint) |
+| Scenario G | Undefined | Added validation positionality statement CLI gate dialogue (University research role reflection scaffolding) |
+
+### What shifted
+- **Concrete Integration Model:** Solidified the system's runtime boundaries by mapping it as an IDE/CLI wrapper over existing databases (preventing Everything-MVP scope creep).
+- **Cross-Domain Generality:** Demonstrated that SkillWeave's core "prompt playbooks" and "reflection gates" generalize beyond programming to design (Figma), research (literature summaries), and planning (collaborative skill creation).

@@ -57,6 +57,19 @@
        - *Meshed Wiki Synthesis:* Once the error code has occurred $N \geq 3$ times, the system runs an offline synthesis script to generate a single consolidated **Troubleshooting Wiki Page**. This page meshes all encounters into a unified guide highlighting common root causes and standard resolution checklists, with links back to individual team case studies.
      - *First-Time Error Fallback (Cold Start):* If an error has never been encountered before in the community database, the helper agent shifts to *Diagnostic Research Mode*. It performs web/documentation searches, guides the builder in constructing a step-by-step debugging plan, and documents their resolution as the first peer recipe for that error.
   6. **Process Improvement Suggestion (Double-Loop Adaptation):** The system flags friction hotspots to the lab coordinator and proposes edits (pull requests) to the global skill templates. Once merged, the shared skills/instructions in the repo are updated, immediately changing the behavior of the local agent skills for all subsequent sessions.
+
+### System Integration & Boundaries
+- **Core Framework (Skill & MCP Server):** Rather than being strictly bound to a single code editor, SkillWeave is designed as a **core skill library** and a **Model Context Protocol (MCP) server**. This allows any compatible AI agent (including CLI agents, browser sidecars, or custom chatbots) to query the local peer repository as a native tool, letting the agent automatically learn from peer steering logs.
+- **Alternative Integration Mediums (Touchpoints):**
+  - *Collaborative Chatbots (Slack/Discord Bots):* A team-wide bot listens to project channels. When a member posts about a prompt struggle, the bot queries the peer index and responds with matching Pivot Prompts and sanitized logs.
+  - *IDE Sidebar & Inline Tooltips (For Developers):* A VS Code/Cursor extension provides matching peer hints and diagnostic checklists in the editor sidebar and binds suggestions directly to compiler errors via hovers.
+  - *CLI Companion (For Terminal Workflows):* A command-line wrapper (`weave [command]`) parses run logs, alerts the developer of matches on build failures, and triggers post-task reflections.
+  - *Chrome/Browser Extension (For Browser Chats):* Captures browser-based agent interactions (like ChatGPT or Claude) and syncs logs to the team repository.
+  - *Team Wiki Dashboard (For General Exploration):* A static web index dashboard allows non-technical team members to search and read peer prompt playbooks manually.
+- **Synchronization & Data Boundaries:** 
+  - *Git Repo Sync:* For self-hosted collaboration, sanitized logs are written to a local project folder (`.weave/`) and synchronized using standard `git push/pull` operations.
+  - *Workspace SSO Sync:* For cloud-hosted teams, logs are stored in a private Firebase/Supabase database bounded strictly to the organization's SSO workspace domain, preventing any public exposure of logs or team IP.
+
 - **Value Proposition:**
   - *Narrative:* For builders, SkillWeave provides diagnostic guidance that teaches them how to steer agents effectively using peer patterns. For coordinators, it turns process design into a data-driven feedback loop.
   - *Testable Hypothesis:* Builders using the reflective helper agent will show a 40% reduction in repeated steering errors and require 30% less direct intervention from coordinators.
@@ -77,6 +90,47 @@
   - *Scenario B (The Reflection & Agent Update Loop):* A designer completes the `/define-brand` skill to create `DESIGN.md`. Upon completion, the CLI triggers `weave submit`. The CLI blocks the upload and prompts: *"1. What was the most difficult design choice you had to steer? 2. What prompt did the agent misunderstand?"* The designer enters: *"We struggled to define brand voice because the template was too startup-focused. I had to prompt the agent to use 'cooperative learning' aesthetics instead."* The CLI sanitizes credentials/secrets and uploads the log, file deltas, and reflection. The next week, the coordinator merges a PR generated from this feedback, modifying `brand-voice.md`. When the designer (or any other team) starts their next branding task, the local agent reads the updated instructions, changing its default prompting style to include cooperative aesthetics.
   - *Scenario C (Coordinator Template Optimization):* The lab lead opens their SkillWeave dashboard at the end of week 3. They view the heatmap for the `/define-brand` template. The section "Visual Voice / Brand Personality" glows red (indicating high time-on-task and multiple manual user edits). The dashboard aggregates reflections: *"5/6 teams reported that default brand voice options were too corporate/startup-oriented."* The dashboard proposes a pull request to `brand-voice.md` to add community-led and research-centric aesthetic examples, resolving the friction for the next cohort.
   - *Scenario D (Cross-Team Sprint Sync):* Team "SmartScheduler" (3 builders, 1 designer) is in the middle of a sprint building a calendar integration. During their weekly retrospective, the team lead notices that they spent 40% of their agent interaction time debugging a React SSR hydration error. They open the logged reflections, identify the SSR configuration mistake, and compile a quick "React-Hydration-Protocol" recipe in their SkillWeave dashboard. Because the system parses files and reflections across teams, it flags that Team "EventTracker" in the same organization is scheduled to implement a similar calendar component next week. SkillWeave proactively alerts EventTracker: *"Team SmartScheduler spent 4 hours resolving React SSR hydration errors. Review their prompt cookbook [Link] before starting."* The EventTracker team reads the recipe before invoking their local agent, avoiding the 4-hour pitfall entirely.
+  - *Scenario E (Non-Coding Figma UI Spacing & Grid Alignment):*
+    - **The Problem:** A designer uses a Figma generative design agent to lay out dashboard cards. The agent keeps generating overlapping elements and hardcoded pixel sizes because it doesn't understand Figma's Auto-Layout constraints.
+    - **What the User Sees:** Overlapping, non-responsive cards in the Figma frame with parameters like `width: 382px; position: absolute; left: 14px;`.
+    - **What the User Asks:** *"Fix the layout of these cards so they are spaced evenly and align correctly in the dashboard frame."* (The Figma agent shifts them slightly but maintains absolute positions, resulting in a misaligned layout on screen resize).
+    - **What SkillWeave Outputs (Figma Sidebar):**
+      The sidebar detects multiple consecutive card repositioning loops on the frame and flashes a Peer Match:
+      > 💡 **Peer Match:** *Team C resolved Figma absolute-positioning loops in Step 3 yesterday.*
+      The designer clicks "View Peer Hint":
+      > **[SkillWeave Helper]** Team C resolved this in Figma design syncs. 
+      > *Pivot Prompt:* "Group these cards in a parent frame with Auto-Layout set to horizontal wrap, and change all children width to 'Fill Container' rather than fixed pixels."
+      > *Diagnostic Questions:* 
+      > 1. Are your cards grouped into a parent Auto-Layout frame?
+      > 2. Have you explicitly told the agent to use 'Fill Container' for relative child sizes?
+    - **How it helps the user get unstuck:** The designer prompts the Figma agent: *"Wrap the three dashboard cards in a parent frame. Enable horizontal Auto-Layout with wrap, and set all card widths to fill the parent container."* The agent correctly groups them, producing a responsive grid.
+  - *Scenario F (Non-Coding Academic Paper Citation Halucinations):*
+    - **The Problem:** A researcher uses a literature review agent to compile a summary of a PDF paper. The agent hallucinates citations (e.g. citing "Bernstein et al., 2024" for claims not present in the PDF) due to relying on its pre-trained weights.
+    - **What the User Sees:** An agent-generated summary containing 3 citation keys that do not exist in the PDF paper.
+    - **What the User Asks:** *"Are you sure those citations are correct? Double check the PDF references list and fix them."* (The agent apologizes and replaces them with another set of hallucinated citations).
+    - **What SkillWeave Outputs (Editor Sidebar):**
+      The sidebar detects the "citation correction" repair pattern in the log and prints:
+      > 💡 **Peer Match:** *Teammate John resolved citation hallucinations summarizing CHI papers.*
+      The researcher clicks "View Peer Hint":
+      > **[SkillWeave Helper]** John resolved this in Literature Reviews.
+      > *Pivot Prompt:* "Do not cite any papers from your pre-trained weights. Only extract inline bracketed footnotes ([^authorYear]) matching the exact bibliography items in the references list of this PDF."
+      > *Diagnostic Questions:*
+      > 1. Have you explicitly told the agent to restrict citations strictly to the PDF's references bibliography?
+      > 2. Are you using footnote citation keys?
+    - **How it helps the user get unstuck:** The researcher prompts the agent: *"Rewrite the paper summary. Do not use any external knowledge or pre-trained citation weights. Restrict all citations strictly to the footnote markers matching the references bibliography at the end of the PDF."* The agent produces a clean, hallucination-free summary.
+  - *Scenario G (Collaborative Process Positionality Statement Gating):*
+    - **The Problem:** A student builder is executing the `/define-validation` process. The agent prompts them to draft their Positionality Statement. The student writes a single low-effort sentence: *"I am an undergraduate student."* The CLI blocks the upload (reflection gate) because the text lacks critical depth.
+    - **What the User Sees:** The terminal blocks submission:
+      `[SkillWeave] Submission rejected: Positionality statement lacks reflection on gender, SES, and authority perceptions. Re-enter:`
+    - **What the User Asks the Helper Agent:** *"What am I supposed to write here? Give me an example of what is expected."*
+    - **What SkillWeave Outputs (Terminal / Sidebar):**
+      The Helper Agent displays a template match:
+      > **[SkillWeave Helper]** Team B successfully passed this validation gate on Step 3 yesterday.
+      > *Sanitized Peer Reference:* "As a researcher from [University X] with a background in [Computer Science], I recognize my position as an authority figure to students..."
+      > *Diagnostic Questions:*
+      > 1. Have you addressed how your affiliation with this university research lab might affect student participant responses?
+      > 2. Have you reflected on your technical background and how it shapes your view of the users?
+    - **How it helps the user get unstuck:** The builder reads the peer outline, understands the expected dimensions of a Positionality statement, and writes a robust 3-paragraph statement reflecting on their student status, technical privilege, and authority perceptions. The CLI accepts the upload.
 
 
 ## Unique Differentiation

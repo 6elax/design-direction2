@@ -1,0 +1,46 @@
+These are fantastic design and architectural questions that get to the heart of how this system behaves as a *collaborative environment*, not just a developer tool.
+
+Here is how these pieces work:
+
+---
+
+### 1. Where does the output display when a user is in difficulty?
+
+We want to avoid popping up annoying, intrusive modals while a user is typing. The tool displays in **three specific places** depending on where the user is working:
+
+*   **Primary: The Editor Sidebar (VS Code Panel).** A dedicated tab in the editor sidebar (called "SkillWeave") lights up with a subtle notification. It displays a card: 
+    > 💡 **Peer Hint Available:** *A peer resolved a similar build crash on auth.service.ts. [Click to view diagnostic prompt].*
+*   **Contextual: Editor Hover Tooltips (Red Squiggly Lines).** When code fails to compile, the editor underlines the error in red. When the user hovers their mouse over the red line, standard VS Code tooltips show the compiler error (e.g. `Type 'string' is not assignable...`). Underneath that error, SkillWeave injects:
+    > *SkillWeave: Team A resolved this exact type error in 3 prompts. [View their Pivot Prompt]*
+*   **Fallback: The Terminal/CLI.** If the user is running build commands in their terminal and hits an error loop, the CLI prints a clean console message at the end of the error stack trace pointing to the matching peer log.
+
+---
+
+### 2. How does a user connect to their organization? (Data boundaries)
+
+We want to make setup zero-friction. SkillWeave hooks directly into the systems organizations already use:
+
+*   **The Git Repository Model:** Organizations keep their code in a shared GitHub/GitLab repository. When a builder initializes the tool in their workspace, SkillWeave creates a hidden folder inside the project repository (e.g. `.weave/`). 
+*   **Automatic Sync:** When they run `weave submit` or commit code, their sanitized logs are saved into this folder and pushed to GitHub. When their teammate runs `git pull`, they automatically download the teammate's resolved error logs. 
+*   **The Workspace SSO Model:** For larger teams, they log in via their organization's single-sign-on (SSO) (e.g., Tech4Good lab portal). The logs are stored in a private Firebase/Supabase database bounded strictly to that organization's account ID. There is **no public leaking of logs**—everything is kept in the team's private git or database.
+
+---
+
+### 3. Does this tool have uses other than coding? (Collaborative planning and skill-making)
+
+**Absolutely. The core pattern of SkillWeave is "Metacognitive Scaffolding for Agent Steering."** This applies to *any* complex workflow where humans collaborate with AI.
+
+Here are three concrete examples beyond coding:
+
+*   **AI-Mediated Design (Figma/Product Design):**
+    Imagine a designer using an AI agent to generate UI mockups. The agent keeps generating ugly color palettes. The designer gets frustrated. SkillWeave detects the struggle, reads past designer logs in the org, and suggests: *"Other designers resolved color rendering by passing HSL color tokens to the Figma agent instead of hex codes. View their prompt."*
+*   **Collaborative Planning (e.g., Academic Writing / Literature Reviews):**
+    A researcher is using an agent to summarize research papers. The agent keeps hallucinating citations. SkillWeave checks what other lab members did and flags: *"Teammates resolved citation hallucinations by injecting a structured BibTeX bibliography into the agent's context first. Click here to see how they structured the request."*
+*   **Creating & Refining Custom Skills:**
+    When teams are planning projects using skills (like we are doing right now with `/define-product` or `/define-validation`), different teams often get stuck writing a Positionality Statement. The sidebar displays: *"Team B successfully finalized their statement by reflecting on SES and authority perceptions. View their structural framework?"*
+
+In all these settings, SkillWeave acts as an **automated, self-updating prompt playbook** for the organization. It captures the trial-and-error of individuals and turns it into shared organizational capability.
+
+Does this broader view of the tool's collaborative and planning uses align with the vision you want to validate?
+
+*(Note: While you respond, I will launch a subagent in the background to check reflections for this turn.)*

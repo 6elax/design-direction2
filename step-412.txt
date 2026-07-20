@@ -1,0 +1,86 @@
+Let’s trace a concrete, step-by-step walkthrough of a real-world scenario in a lab setting to show exactly what this interaction looks like, how a peer's transcript is referenced, and how we measure and rate its effectiveness.
+
+---
+
+### Part 1: The Concrete Problem Scenario
+
+#### The Context
+*   **Team A (The Pioneers):** Last week, Team A was building a feature using a new Angular SSR (Server-Side Rendering) architecture. They spent 4 hours fighting a hydration error because their local code used `localStorage` inside a component constructor, which crashed the server during prerendering. They eventually figured out they needed to shield it using Angular's `PLATFORM_ID` check. They submitted their code and their CLI reflection: *"Agent kept using localStorage directly during prerender. Had to steer it to check platformId before accessing browser-only APIs."*
+*   **Team B (The Followers):** This week, Team B is setting up a new authentication component. They run their local agent to scaffold the auth flow. Suddenly, their build crashes with the exact same hydration error. 
+
+---
+
+### Part 2: How the Tool is Actually Used (Step-by-Step)
+
+#### Step 1: Detection & The Trigger offer (Telemetry)
+1.  Team B’s terminal prints a build crash: `ReferenceError: localStorage is not defined`.
+2.  Rather than immediately jumping in, the local CLI detects **Steering Breakdown Signals**:
+    *   The build has failed 3 times in the last 15 minutes.
+    *   The builder has reverted their git diff twice.
+    *   The builder has been idle (no keystrokes) for 5 minutes.
+3.  The CLI prints a non-intrusive prompt:
+    ```bash
+    [SkillWeave] It looks like you've encountered 3 build failures on SSR hydration. 
+    A peer team resolved a similar issue last week. 
+    Would you like the Helper Agent to suggest a diagnostic hint? [y/N]: y
+    ```
+
+#### Step 2: The Constrained Scaffolding Interaction
+The local Helper Agent activates. It is structurally forbidden from writing the fix for the builder. Instead, it queries the sanitized peer database, isolates Team A's **Pivot Moment**, and prints:
+
+```markdown
+[SkillWeave Helper]
+Team A encountered a hydration failure with localStorage last week.
+They resolved it in: docs-plans/project-foundations/brand-voice.md (Step 3).
+
+Here is their Pivot Moment (the prompt that solved it):
+"Check if we are in a browser context using isPlatformBrowser before accessing localStorage."
+
+Diagnostic Questions to check your code:
+1. Is your agent trying to read localStorage during component initialization?
+2. Are you importing isPlatformBrowser from '@angular/common'?
+```
+
+#### Step 3: Referencing the Chat Log (The Timeline View)
+If the builder needs more context, they click a link in the helper output. This opens a streamlined markdown timeline of Team A's 4-hour session. Instead of showing all 10,000 lines of chat history, it shows:
+
+*   `[00:15] Build Failed` (localStorage ReferenceError) — *[Collapsible: 12 messages hidden]*
+*   `[01:10] Attempted fix: inject window` (Failed) — *[Collapsible: 8 messages hidden]*
+*   `[02:40] Pivot Moment: Introduced PLATFORM_ID check` (Build Succeeded) — *[Expanded]*
+    *   *Show prompt:* `"Inject platformId and wrap the call..."*
+
+Team B's builder reads the Pivot Moment, realizes their agent did the exact same thing, and types to their local assistant: *"Wrap our auth token check in isPlatformBrowser."* The build passes.
+
+#### Step 4: Submission & NLU Quality Gating
+Team B runs `weave submit`. The CLI blocks the upload:
+```bash
+[SkillWeave] Please enter a 1-sentence reflection on how you steered the agent:
+> fixed auth token
+[SkillWeave] Reflection rejected: Input lacks descriptions of surprise or reframing. 
+Please describe what the agent did unexpectedly and how you steered it back:
+> Agent accessed localStorage directly in auth.service constructor, causing hydration failure. Steered it by wrapping it in isPlatformBrowser.
+[SkillWeave] Reflection accepted. Logs uploaded successfully.
+```
+
+---
+
+### Part 3: Rating the Effectiveness of this Interaction
+
+If we evaluate this specific interaction against our research framework, how do we rate its effectiveness? 
+
+#### Rating: 4.5 / 5 (Highly Effective)
+
+Here is the breakdown of why this rate is justified and where the remaining friction lies:
+
+| Evaluation Dimension | Rating | Evidence / Mechanics |
+|---|---|---|
+| **Steering Competency (Learning)** | **5/5** | **Excellent.** Because the Helper Agent was constrained from generating the code, the developer had to formulate the steering prompt themselves (*"Wrap our auth token check in isPlatformBrowser"*). They didn't just copy-paste a patch; they learned the conceptual model of SSR hydration constraints. |
+| **Cohort Velocity (Efficiency)** | **5/5** | **Excellent.** Team B resolved in **5 minutes** a complex build crash that took Team A **4 hours** to debug. The organization preserved 3.9 hours of developer time. |
+| **Cognitive Load (Interface Usability)** | **4/5** | **Good, with minor friction.** The collapsible timeline successfully hid the raw 4-hour logs, preventing information overload. However, the NLU gating on `weave submit` introduces minor workflow friction (the student had to rewrite their reflection once), which is a necessary "desirable difficulty" but slightly annoys the builder. |
+| **Double-Loop Loop closing** | **4/5** | **Very Good.** The coordinator dashboard flags that 2 teams have now struggled with `localStorage` in constructors. It recommends updating the master `angular-ssr-instructions.md` template file to explicitly forbid constructor storage calls. Once merged, future agents will never make this mistake again. |
+
+---
+
+Does this scenario and rating structure help you see what the actual system journey looks like? Let me know if you would like to adjust the MVP sequence based on these concrete steps!
+
+*(Note: While you respond, I will launch a subagent in the background to check reflections for this turn.)*
