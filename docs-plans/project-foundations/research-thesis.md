@@ -34,7 +34,7 @@
 - **Why this theory, specifically:** Explains the design constraints of the helper agent. To ensure the builder learns rather than offloads cognition, the helper agent is structurally constrained: it cannot write code or generate direct answers. Instead, it provides *scaffolding* within the builder's Zone of Proximal Development (ZPD) by operationalizing two specific tutoring functions:
   - *Reduction in degrees of freedom:* Hiding verbose, raw 4-hour logs and showing only the LLM-extracted *Pivot Moments* (TL;DR fixes) to prevent cognitive overload.
   - *Marking critical features:* Pointing out discrepancies between the user's current code/prompts and successful peer solutions, asking diagnostic questions to guide the builder to resolve the issue themselves.
-- **Key reference:** Wood, D., Bruner, J. S., & Ross, G. (1976). The role of tutoring in joint problem solving. *Journal of Child Psychology and Psychiatry*, 17(2), 89-100. [https://doi.org/10.1111/j.1469-7610.1976.tb00381.x](https://doi.org/10.1111/j.1469-7610.1976.tb00381.x)
+- **Key reference:** [Wood et al., 1976](https://doi.org/10.1111/j.1469-7610.1976.tb00381.x). The role of tutoring in joint problem solving. *Journal of Child Psychology and Psychiatry*, 17(2), 89-100.
 - **Alternative considered:** Self-Determination Theory (Ryan & Deci) (considered because it focuses on intrinsic motivation, competence, and autonomy, but rejected because it does not provide concrete design constraints for dialogue formatting or prompt construction, which Scaffolding directly provides).
 
 ### 3. Double-Loop Learning (Chris Argyris & Donald Schön) — *For the Template Optimization*
@@ -76,14 +76,39 @@ Existing tools focus entirely on individual development velocity via automation 
 *Note: The statements below are contribution hypotheses — framed as the potential claims we believe the eventual paper will be able to make, based on the gaps identified above. They will be refined or revised once deployment data confirms or challenges them.*
 
 - **Knowledge Contribution (one sentence):** A design framework and system implementation showing how sanitizing and aggregating human-agent interaction transcripts can drive both individual metacognitive reflection and collaborative workflow optimization in cohort-based development.
+
+### Central Research Questions
+*   **Central RQ:** *How can we design collaborative development systems that passively capture and aggregate individual human-AI interaction logs to scaffold individual metacognitive learning and optimize shared team workflows without causing excessive cognitive load or user frustration?*
+    *   **RQ1 (Individual Learning & Scaffolding):** *How do agentic output constraints (restricting code generation in favor of peer-referenced diagnostic guidance) affect a developer’s conceptual understanding and ability to steer agents through new, unseen errors over time?*
+    *   **RQ2 (Community Knowledge Synthesis):** *How can we passively extract, sanitize, and mesh verbose human-agent dialogue logs into structured, low-friction peer troubleshooting wikis that preserve contextual relevance while protecting user privacy?*
+    *   **RQ3 (Double-Loop Process Optimization):** *How does exposing aggregated team-wide friction patterns affect coordinators' ability to identify and resolve structural flaws in shared workflow templates, and what is the downstream impact on cohort error velocity?*
+
+### Uniqueness & Research Contributions
+
+#### 1. Systemic Uniqueness (The Collaborative Telemetry Model)
+Existing AI programming assistants (e.g. Copilot, Cursor, ChatGPT) treat human-AI interaction as an isolated, private sandbox. What a developer learns or struggles with is locked inside their local editor session. SkillWeave breaks this isolation by designing a **Model Context Protocol (MCP) telemetry system** that passively captures, meshes, and synthesizes private developer logs into a shared, cohort-wide knowledge base. It is the first system to bridge the gap between individual human-AI steering and team-level organizational learning.
+
+#### 2. Empirical Contributions (Learning under Agentic Constraints)
+We will compile empirical data observing what happens when real developer cohorts deploy this in-the-wild. We will measure:
+- How developer independence (resolution speed of unseen errors) scales over time under diagnostic constraints vs. direct autocomplete.
+- The NLU-scored quality and conceptual depth of post-task reflections over time (capturing genuine surprise/reframing).
+- The coordinator adoption and acceptance rate of dashboard-proposed template updates.
+
+#### 3. Conceptual Contribution (The "Bit Flip")
+*   **The Bit Flip:** *"Most people assume that AI assistants should maximize task automation by generating direct code solutions, but our work shows that constraining the agent to diagnostic, peer-referenced guidance drives deeper user reflection and builds long-term developer competence."*
+*   **Novelty Defense:** If reviewers claim this is just "another QA site or tutor bot," we respond:
+    1. It captures process and dialog dynamics passively rather than relying on manual writing.
+    2. The helper agent uses scaffolding and peer context rather than tutoring exercises.
+    3. It implements double-loop learning by feeding individual friction back into the shared workspace instructions.
+
 - **Product Value vs. Research Contribution:**
   - *Product Value:* Students resolve programming errors faster, write higher-quality code, and lab leads spend less time debugging team issues.
   - *Research Contribution:* Understanding how interface constraints (forbid code generation, mandate post-task reflection) and cohort knowledge aggregation shape developer learning and prompt-steering capability.
-- **Bit Flip:** "Most people assume that AI assistants should maximize automation by generating direct code solutions, but our work shows that constraining the agent to diagnostic, peer-referenced guidance drives deeper user reflection and builds long-term developer competence."
-- **Novelty Defense:** If reviewers claim this is just "another QA site or tutor bot," we respond: (1) It captures process and dialog dynamics passively rather than relying on manual writing; (2) The helper agent uses scaffolding and peer context rather than tutoring exercises; (3) It implements double-loop learning by feeding individual friction back into the shared workspace instructions.
 - **Paper Type:** Systems + Empirical Evaluation (CSCW/CHI Systems paper).
 - **Target Venue:** ACM CHI (Human Factors in Computing Systems) or ACM CSCW (Computer-Supported Cooperative Work).
 - **Audience:** HCI researchers studying human-AI collaboration, CSCL researchers, and designers of developer tools.
+
+---
 
 ## Appendix: Research Landscape
 

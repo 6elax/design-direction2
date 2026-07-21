@@ -211,3 +211,21 @@ It defines the narrowest wedge (MVP) focused on parsing local files (`product-th
 ### What shifted
 - **Concrete Integration Model:** Solidified the system's runtime boundaries by mapping it as an IDE/CLI wrapper over existing databases (preventing Everything-MVP scope creep).
 - **Cross-Domain Generality:** Demonstrated that SkillWeave's core "prompt playbooks" and "reflection gates" generalize beyond programming to design (Figma), research (literature summaries), and planning (collaborative skill creation).
+
+---
+
+## Cycle 9: Detailed Storage Architecture
+
+### AI Critique/Query
+1. ❓ **Detailed Storage Specifications**: The user asked to explain how the database of chatlogs is stored and preserved in the system, and then requested to write this detailed architecture back into the product thesis.
+
+### User Response
+> can you add the information about storage into the  product-thesis.md
+
+### Document Delta
+| Field | Before | After |
+|---|---|---|
+| product-thesis.md | Simple Git Repo Sync and Workspace SSO Sync bullets | Expanded **Synchronization & Data Boundaries** to detail Git Repo Sync (local-first peer sync), Workspace SSO Sync (authenticated domain lock), Local DB Cache & Embedding Index (local SQLite/vector caching), and Telemetry Buffering (temporary volatile RAM to prevent database bloat). |
+
+### What shifted
+- **Storage & Synchronization Rigor:** Solidified the data safety, indexing, and synchronization architecture of the tool, defining how the system manages developer privacy (local buffering) and minimizes network latency (local SQLite/vector caches).

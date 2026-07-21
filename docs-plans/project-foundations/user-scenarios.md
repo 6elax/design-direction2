@@ -58,11 +58,15 @@ A user's problem does not need to be identical to a peer's for SkillWeave to sug
    - It prioritizes matches that occurred during the execution of the same workflow milestone, as teams are likely facing the same structural boundaries.
 
 ### 6. Safeguarding Exploration vs. The "Copy-Paste" Automation Trap
-A major risk in peer-learning tools is the "single-mind bias"—if a user is shown a single peer's working solution, they might copy it blindly without exploring alternative architectures, harming their own learning.
-SkillWeave mitigates this through three deliberate design constraints:
-- **No Direct Code Snippet Delivery:** The tooltips and sidebars do *not* display copy-pasteable blocks of the peer's final code. They only display the **Pivot Prompt** (the instruction) and the **Diagnostic Questions** (the concept). The user is forced to type a prompt in their own words and steer their own agent to write the code.
-- **Alternative Highlighting:** When displaying the Meshed Wiki or progressive tabs, the system highlights differing approaches (e.g. showing that Team A solved an error using Axios intercepts while Team B solved it using Angular HTTP interceptors). This exposes the builder to multiple valid designs.
-- **Forced Steering Reflection:** Because the current user must still write a reflection that passes the NLU gate to commit their own code, they cannot remain passive. They must be able to articulate *how* they steered their agent, preventing mindless replication.
+A major risk in peer-learning tools is the "single-mind bias"—if a user is shown a single peer's working solution, they might copy it blindly without exploring alternative architectures, harming their own learning. This risk is especially critical in tasks requiring deep thinking, planning, and research (such as drafting a thesis, designing system structures, or scoping products), where there is no single "correct" output. The tool is designed to scaffold a builder's *own* reasoning process rather than leading them to replicate a peer's identical conclusion.
+
+SkillWeave enforces this divergent exploration through four deliberate design constraints:
+- **No Direct Code or Text Copy-Pasting:** The tooltips and sidebars do *not* display copy-pasteable blocks of the peer's final code or written text. They only display the **Pivot Prompt** (the steering instruction) and the **Diagnostic Questions** (the underlying concept). 
+- **Multi-Angle Contrast Panels:** For planning and research milestones, the sidebar does not present a single "best" solution. Instead, it dynamically clusters and presents **contrasting peer perspectives** (e.g., showing how Team A resolved a value proposition challenge by focusing on learner-sourcing while Team B resolved it by focusing on Socratic tutoring). This forces the builder to compare different design trade-offs.
+- **Socratic Contrast Prompts:** When presenting peer cases, the tool generates comparative prompts: *"Peer Aubrey chose to prioritize a Learner-Sourcing telemetry model to resolve this. How does your project's focus (e.g. Socratic routing) adapt or push back against that decision?"* This triggers critical comparison rather than blind alignment.
+- **Cognitive Translation & NLU Verification:** The NLU quality gate evaluates the user's own reflections before allowing a commit. For thinking-heavy tasks, the gate checks that the reflection contains *unique project-specific vocabulary* and explicitly rejects submissions that show high lexical or structural similarity to peer logs. The builder must articulate *their own* rationale, ensuring divergent outcomes are preserved.
+
+---
 
 ### 7. Multi-Modal Artifact Sourcing & Cross-Platform Deep-Linking
 For tasks operating on different platforms (such as code editor environments, design canvases, database clients, or academic writing tools), a raw text chat log is often insufficient to fully communicate the peer's resolution. SkillWeave resolves this by automatically capturing and delivering **platform-specific complementary materials** alongside the dialogue transcript and NLU reflections:

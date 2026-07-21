@@ -172,4 +172,20 @@ The initial draft proposes a research thesis for **SkillWeave** mapping the acad
 - **Scaffolding Evaluation:** Strengthened the empirical study design by mapping telemetry metrics to cognitive growth (reflection depth and general steering transfer).
 - **Technological Enablement:** Positioned the system's contribution around newly possible AI capabilities that automate the extraction of dialogue context.
 
+---
 
+## Cycle 7: Research Questions Formulation & Uniqueness Elaborations
+
+### AI Critique/Query
+1. ❓ **Elaborating Research & RQ Formulation**: The user initiated the `/define-research` command to request a detailed elaboration on the research uniqueness/contributions and a summarizing research question (RQ).
+
+### User Response
+> /define-research can you elaborate on the research part and the uniqueness/contributions that this tool/project/research idea will bring? and can you come up with a research question that basically summarizes what the research is trying to find?
+
+### Document Delta
+| Field | Before | After |
+|---|---|---|
+| research-thesis.md | Vague contribution statement and generic novelty list | Added **Central Research Questions** (comprising a central RQ and three sub-questions mapping to scaffolding, meshing, and double-loop learning). Added **Uniqueness & Research Contributions** detailing systemic (collaborative telemetry), empirical, and conceptual (bit flip) differentiators. |
+
+### What shifted
+- **Academic Rigor & Structuring:** Grounded the research thesis with an explicit central RQ and sub-questions, and mapped the uniqueness across system, empirical, and conceptual dimensions to prepare the project for academic review (e.g. CHI/CSCW).

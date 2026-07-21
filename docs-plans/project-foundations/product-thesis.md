@@ -67,8 +67,10 @@
   - *Chrome/Browser Extension (For Browser Chats):* Captures browser-based agent interactions (like ChatGPT or Claude) and syncs logs to the team repository.
   - *Team Wiki Dashboard (For General Exploration):* A static web index dashboard allows non-technical team members to search and read peer prompt playbooks manually.
 - **Synchronization & Data Boundaries:** 
-  - *Git Repo Sync:* For self-hosted collaboration, sanitized logs are written to a local project folder (`.weave/`) and synchronized using standard `git push/pull` operations.
-  - *Workspace SSO Sync:* For cloud-hosted teams, logs are stored in a private Firebase/Supabase database bounded strictly to the organization's SSO workspace domain, preventing any public exposure of logs or team IP.
+  - *Git Repo Sync (Local-First):* For self-hosted and repository-centric teams, sanitized logs are written to a local project folder (`.weave/` or `.t4g/`) inside the workspace repository. Teammates synchronize logs peer-to-peer using standard `git push/pull` commands, ensuring zero external network dependency.
+  - *Workspace SSO Sync (Cloud-Gated):* For enterprise and cloud-hosted teams, logs are preserved in a private Firebase/Supabase database. Access is strictly bounded by the organization's Single Sign-On (SSO) email domain, preventing any public exposure of code assets or team IP.
+  - *Local DB Cache & Embedding Index:* The local IDE sidebar queries a local database cache (SQLite) to dynamically search peer transcripts. A background process runs a lightweight local embedding model to compute semantic similarity vectors, ensuring rapid match retrieval directly in the client editor without constant network round-trips.
+  - *Telemetry Buffering & Privacy Gating:* To prevent database bloat and protect developer privacy, telemetry streams (ast parses, compiler errors, browser chats) are buffered in volatile local memory. They are only flushed and indexed into the persistent workspace database once the task completes and passes the automated validation gates (compiler success + user-confirmed toast confirmation).
 
 - **Value Proposition:**
   - *Narrative:* For builders, SkillWeave provides diagnostic guidance that teaches them how to steer agents effectively using peer patterns. For coordinators, it turns process design into a data-driven feedback loop.
