@@ -85,6 +85,15 @@ Existing tools focus entirely on individual development velocity via automation 
 
 ### Uniqueness & Research Contributions
 
+#### Positioning Matrix: Prior Work vs. SkillWeave
+
+| Dimension / Area | Past Approaches (What people were doing) | SkillWeave (What we do differently) |
+| :--- | :--- | :--- |
+| **AI Tutoring & Coding Assistance** | **Direct Autocomplete & Isolated Sandboxes:** Standard LLM tools (e.g., Copilot, Cursor) optimize for speed by generating code, leading to deskilling. Traditional Intelligent Tutoring Systems (ITS) provide isolated playgrounds separate from the real workspace. | **In-Context Diagnostic Constraints:** Constrains the helper agent from writing code, serving peer-referenced, context-specific Socratic questions linked directly to the developer's runtime editor workspace. |
+| **Process Knowledge Capture** | **Manual Playbook Writing:** Relies on users manually compiling wikis, Q&A logs, or post-task write-ups, creating a high-friction "context gap" that hides the actual steering sequence. | **Passive Telemetry Extraction:** Passively captures background human-agent conversation transcripts and workspace diffs, sanitizing and indexing them automatically without developer overhead. |
+| **Knowledge Representation** | **Consensus-Driven Summarization:** Standard synthesis tools group data by averaging out inputs or generating keyword lists, which flattens dissenting opinions and erases cognitive friction. | **Friction-Preserving Synthesis:** Groups peer records by conceptual divergence, explicitly highlighting points of contention and alternative design variant paths. |
+| **Workflow Optimization** | **Static Instruction Docs:** Team guides and templates are static documents (e.g., wiki pages) that decay over time because identifying cohort-wide friction requires manual coordinator audit. | **Double-Loop Template Adaptation:** Automatically analyzes cohort-wide friction heatmaps and generates Pull Requests to optimize the shared workspace instructions for the entire team. |
+
 #### 1. Systemic Uniqueness (The Collaborative Telemetry Model)
 Existing AI programming assistants (e.g. Copilot, Cursor, ChatGPT) treat human-AI interaction as an isolated, private sandbox. What a developer learns or struggles with is locked inside their local editor session. SkillWeave breaks this isolation by designing a **Model Context Protocol (MCP) telemetry system** that passively captures, meshes, and synthesizes private developer logs into a shared, cohort-wide knowledge base. It is the first system to bridge the gap between individual human-AI steering and team-level organizational learning.
 

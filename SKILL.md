@@ -11,59 +11,34 @@ Unlike standard autocomplete or code search, SkillWeave does **not** copy-paste 
 
 ---
 
-## 🛠️ Command-Line Interface (CLI) API
+## 🔍 Progressive Disclosure UI (IDE Split-Pane / Chat Card)
 
-To run SkillWeave in your local workspace, use the `weave` command-line companion wrapper:
+When the background telemetry watcher detects a match, the system presents suggestions through a seamless transition from chat to workspace views:
 
-### 1. Initialize the Workspace
-Sets up a local tracking directory (`.weave/`) and configures repository-level git hooks.
-```bash
-weave init
+### Level 1: Inline Chat Card (Popup above Chat Input)
+A styled suggestion card slides in directly above the chat text input area, catching the developer before they submit a prompt:
 ```
-
-### 2. Check Telemetry Status
-Displays active compilation buffers, cached error signatures, and synchronization status.
-```bash
-weave status
-```
-
-### 3. Seek Diagnostic Assistance
-Queries the local SQLite database for peer case studies that match your recent compiler errors or prompt history.
-```bash
-weave helper --query "Firestore security rule permission denied"
-```
-
-### 4. Submit and Sanitize Session
-Blocks, sanitizes credentials/secrets, prompts the user with post-task reflections, and writes the validated case study to the `.weave/` peer database index.
-```bash
-weave submit --task "feature-harden-implement"
-```
-
----
-
-## 🔍 Progressive Disclosure UI (IDE Sidebar / CLI)
-
-When a developer encounters a recorded compiler error or prompt friction hotspot, the helper agent displays suggestions in three progressive fidelity levels:
-
-### Level 1: Inline Toast / Hover Alert
-A lightweight, low-friction notification in the code editor or terminal indicating a matching peer recipe.
-```
-💡 Peer Match: Teammate resolved a similar Firestore permission error.
+💡 Peer Match Found (94% confidence) — Teammate resolved a similar Firestore permission error.
 Pivot Prompt: "How do security rules validate custom token claims compared to standard auth.uid checks?"
+[🔍 Open Peer Workspace Pane]  [Dismiss]
 ```
 
-### Level 2: Sidebar Panel (Multi-Angle Contrast Panel)
-A structured sidebar displaying Socratic prompts, peer reflection deltas, and deep links to relevant workspace files:
+### Level 2: Workspace Split-Pane (Right-Side Webview)
+Clicking the button splits the editor layout, loading a temporary, read-only markdown panel on the right side of the screen (`skillweave://peers/causeway/case-study.md`) displaying comparative deltas and Socratic prompts:
 ```markdown
-[SkillWeave Workspace Sidebar]
+[SkillWeave Workspace Pane]
 Project: SmartScheduler | Author: User 1
 Target Goal: Secure Firestore collections using custom claims.
 
-Pivot Reflection:
+Peer Reflection:
 "We realized that Firestore rule auth.uid does not verify admin custom claims automatically. We resolved this by querying request.auth.token.admin == true. If your team does not use admin roles, evaluate if resource-owner gating fits your collections better."
 
+Comparative Code Diff:
+- allow read, write: if request.auth != null && request.auth.uid == userId;
++ allow read, write: if request.auth != null && request.auth.token.admin == true;
+
 Workspace Materials:
-- [rules.firestore:L12-25 (Security Rules Diff)](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/project-foundations/validation-plan.md)
+- [rules.firestore:L12-25 (Security Rules)](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/project-foundations/validation-plan.md)
 - [admin-claims-schema.json (Database Claims)](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/project-foundations/product-thesis.md)
 
 Contrast Questions:
@@ -71,8 +46,8 @@ Contrast Questions:
 2. What are the security trade-offs of checking custom claims on every query?
 ```
 
-### Level 3: Collapsible Dialogue Timeline
-A collapsed timeline of the peer's actual chat logs, allowing the user to trace the logical sequence of how they steered their agent.
+### Level 3: Collapsible Dialogue Accordion (Inside Split-Pane)
+An accordion menu at the bottom of the Workspace Pane that expands to show the peer's actual step-by-step chat conversation history:
 ```
 ▶ Click to expand peer dialogue history (8 messages collapsed, 2 Pivot turns shown)
 ```
@@ -81,30 +56,65 @@ A collapsed timeline of the peer's actual chat logs, allowing the user to trace 
 
 ## 🛰️ Telemetry Collection Hooks
 
-SkillWeave captures telemetry passively across three distinct developer touchpoints:
+SkillWeave captures telemetry passively in the background of the human-agent conversation across three touchpoints:
 
-1.  **IDE Save Watcher:** Tracks active file saves and records compiler or linter errors (e.g. `TypeScript` compilation failures) to compile a timeline of developer struggle.
-2.  **CLI Command Interceptor:** Intercepts command runs via a wrapper shell. If a command (e.g. `npm run build` or `npm run test`) fails 3 or more times consecutively, it triggers a Level 1 search.
-3.  **Browser Chat Grabber:** Watches local agent client databases (like Cursor or Copilot config databases) or browser chat history to scrape the prompt histories leading to the resolution.
+1.  **Chat Conversation Watcher:** Monitors active chat dialogues and parses error logs, traceback warnings, or compiler output pasted directly into the chat.
+2.  **Workspace Snapshot Listener:** Analyzes workspace context files or code deltas shared by the developer with the agent during the conversation.
+3.  **Prompt Sequence Analyzer:** Tracks consecutive user prompts to detect repeat attempts at steering the agent through the same block, triggering a search when a pattern match is found.
 
 ---
 
 ## 🔒 Verification & Privacy Gates
 
-Before any session is committed to the community database, it must pass three automated gates:
+Before any session is committed to the community database, it must pass three automated background gates:
 
 ```mermaid
 graph TD
-    A[Struggle Detected] --> B[Toast Prompt: 'Did that resolve the issue?']
-    B -->|Yes| C[Run Compiler & Linter Check]
+    A[Struggle Detected] --> B[Popup Prompt: 'Did that resolve the issue?']
+    B -->|Yes| C[Verify Resolution via Chat Context]
     B -->|No| A
     C -->|Success| D[Run Regex Credential Sanitizer]
     C -->|Failure| A
     D -->|Sanitized| E[Prompt Post-Session Reflection]
-    E --> F[Commit to .weave/ Database]
+    E --> F[Commit to Local Cache & Sync]
 ```
 
-1.  **Micro-Toast Gate:** When the developer resolves an error, a minor UI prompt appears:
+1.  **Micro-Toast Gate:** When the system detects a resolved struggle (indicated by user statement or positive code compile shared in chat), a popup appears above the chat input:
     `💡 Did that last step resolve the issue? [Yes: Save Log] [No: Keep Working]`
-2.  **Lint & Build Gating:** Sanitizes the workspace. Only sessions where the project compiles and passes unit tests successfully are marked as viable case studies.
+2.  **Validation Check:** Confirms task completion by verifying that updated code structures or test outputs shared in the chat log pass validation rules.
 3.  **Credential Sanitizer:** Runs regex parsers over code diffs and chat logs to scrub API tokens, secrets, private URLs, and personal details before saving.
+
+---
+
+## ⚙️ Background Trigger Protocol
+
+To make the AI agent execute SkillWeave automatically in the background at the end of each conversational turn:
+
+1.  **End-of-Turn Scan:** The agent scans the active conversation transcript using the background script in `check` mode:
+    ```bash
+    npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
+      --mode check \
+      --transcript "<appDataDir>/brain/<conversation-id>/.system_generated/logs/transcript.jsonl" \
+      --workspace-root "<WORKSPACE_ROOT>"
+    ```
+2.  **Struggle Identification:** If an `ERROR-CODE` (compiler failure / linter block) or `FRUSTRATION` (user-expressed struggle) is returned, retrieve the top 3 similar peer cases from `.t4g/agent-memory.db`.
+3.  **Socratic Suggestion Card:** Prepend the Level 1 Inline suggestion card above the prompt input window in the response. If the developer clicks `[🔍 Open Peer Workspace Pane]`, open the right-side split-pane view.
+
+---
+
+## 💾 Database Logging Pipeline
+
+When a developer indicates task completion (passing the NLU verification gate), prompt them with post-task reflections and log the entry back to the shared repository database:
+
+```bash
+npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
+  --mode log \
+  --workspace-root "<WORKSPACE_ROOT>" \
+  --payload '{"type":"TYPE","key":"KEY","insight":"INSIGHT","example":"EXAMPLE","conversation-id":"CONVERSATION_ID"}'
+```
+
+*   **type:** Either `ERROR-CODE` or `FRUSTRATION`.
+*   **key:** Unique kebab-case name of the learning.
+*   **insight:** Description of the struggle (from post-task reflection questions).
+*   **example:** The solution that got them unstuck.
+*   **conversation-id:** Current conversation UUID.
