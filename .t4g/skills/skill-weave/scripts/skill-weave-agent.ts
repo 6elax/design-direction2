@@ -8,7 +8,9 @@ const { positionals, values } = parseArgs({
     "mode": { type: "string" }, // "check" or "log"
     "transcript": { type: "string" },
     "workspace-root": { type: "string" },
-    "payload": { type: "string" } // JSON payload for logging
+    "payload": { type: "string" }, // JSON payload for logging
+    "type": { type: "string" }, // Struggle type passed by reflections agent
+    "struggle": { type: "string" } // Struggle text passed by reflections agent
   },
   allowPositionals: true,
 });
@@ -38,49 +40,54 @@ function getKeywords(text: string): string[] {
 }
 
 if (values["mode"] === "check") {
-  const transcriptPath = values["transcript"];
-  if (!transcriptPath || !existsSync(transcriptPath)) {
-    console.error("Please provide a valid transcript path using --transcript");
-    process.exit(1);
-  }
+  let lastStruggleText = values["struggle"] as string | undefined;
+  let lastStruggleType = values["type"] as string | undefined;
 
-  const content = readFileSync(transcriptPath, "utf-8");
-  const lines = content.split("\n");
+  if (!lastStruggleText || !lastStruggleType) {
+    const transcriptPath = values["transcript"];
+    if (!transcriptPath || !existsSync(transcriptPath)) {
+      console.error("Please provide --type and --struggle, OR a valid transcript path using --transcript");
+      process.exit(1);
+    }
 
-  let lastStruggleText = "";
-  let lastStruggleType = "";
+    const content = readFileSync(transcriptPath, "utf-8");
+    const lines = content.split("\n");
 
-  // Parse lines from bottom up (newest first) to find recent struggle
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    try {
-      const entry = JSON.parse(line);
-      // Check for user errors or tool errors
-      if (entry.type === "ERROR_MESSAGE") {
-        lastStruggleText = entry.content || "";
-        lastStruggleType = "ERROR-CODE";
-        break;
-      }
-      if (entry.tool_calls) {
-        for (const call of entry.tool_calls) {
-          if (call.output && (call.output.toLowerCase().includes("error") || call.output.toLowerCase().includes("fail"))) {
-            lastStruggleText = call.output;
-            lastStruggleType = "ERROR-CODE";
+    lastStruggleText = "";
+    lastStruggleType = "";
+
+    // Parse lines from bottom up (newest first) to find recent struggle
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      try {
+        const entry = JSON.parse(line);
+        // Check for user errors or tool errors
+        if (entry.type === "ERROR_MESSAGE") {
+          lastStruggleText = entry.content || "";
+          lastStruggleType = "ERROR-CODE";
+          break;
+        }
+        if (entry.tool_calls) {
+          for (const call of entry.tool_calls) {
+            if (call.output && (call.output.toLowerCase().includes("error") || call.output.toLowerCase().includes("fail"))) {
+              lastStruggleText = call.output;
+              lastStruggleType = "ERROR-CODE";
+              break;
+            }
+          }
+          if (lastStruggleText) break;
+        }
+        if (entry.type === "USER_INPUT") {
+          const text = entry.content || "";
+          if (text.toLowerCase().includes("error") || text.toLowerCase().includes("fail") || text.toLowerCase().includes("struggle") || text.toLowerCase().includes("stuck") || text.toLowerCase().includes("wrong")) {
+            lastStruggleText = text;
+            lastStruggleType = "FRUSTRATION";
             break;
           }
         }
-        if (lastStruggleText) break;
-      }
-      if (entry.type === "USER_INPUT") {
-        const text = entry.content || "";
-        if (text.toLowerCase().includes("error") || text.toLowerCase().includes("fail") || text.toLowerCase().includes("struggle") || text.toLowerCase().includes("stuck") || text.toLowerCase().includes("wrong")) {
-          lastStruggleText = text;
-          lastStruggleType = "FRUSTRATION";
-          break;
-        }
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
   }
 
   if (!lastStruggleText) {

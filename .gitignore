@@ -1,0 +1,3 @@
+
+# Ignore local agent memory and database binaries
+.t4g/

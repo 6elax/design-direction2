@@ -42,16 +42,17 @@ To pre-populate the database with the baseline peer struggle analysis dataset (e
 ---
 
 ### Step 4: Hook the Skill into Chat Agent Rules
-To make the AI agent run SkillWeave automatically behind the scenes of every chat turn, add a system rule in your project's rules file (e.g. `.cursorrules`, `.gemini/rules.md`, or your workspace `rules.md`):
+To make the AI agent run SkillWeave automatically behind the scenes of every chat turn, hook it into your project's agent-reflections rules file (e.g. `.cursorrules`, `.gemini/rules.md`, or your workspace `rules.md`):
 
 ```markdown
 ## Antigravity SkillWeave Trigger Hook
 At the end of every conversational turn:
-1. Scan the current conversation transcript for compiler errors or user struggles:
-   `npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts --mode check --transcript "<path-to-transcript.jsonl>" --workspace-root "<project-root>"`
-2. If similar peer cases are found (Match Score >= 1), prepend the Level 1 Inline suggestion card above the prompt input window:
+1. Wait for the agent-reflections skill to scan the transcript.
+2. If the reflections agent identifies a struggle, pass the type and struggle text directly to SkillWeave:
+   `npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts --mode check --type "[ERROR-CODE / FRUSTRATION]" --struggle "[STRUGGLE_TEXT]" --workspace-root "<project-root>"`
+3. If similar peer cases are found (Match Score >= 1), prepend the Level 1 Inline suggestion card above the prompt input window:
    "💡 Peer Match Found (94% confidence) — Teammate resolved a similar error. [🔍 Open Peer Workspace Pane]"
-3. Upon task resolution (NLU verified or build succeeds):
+4. Upon task resolution (NLU verified or build succeeds):
    - Prompt the user with the 3-question reflection toast.
    - Commit the reflection back to the DB:
      `npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts --mode log --workspace-root "<project-root>" --payload '{"type":"[TYPE]","key":"[KEY]","insight":"[INSIGHT]","example":"[EXAMPLE]","conversation-id":"[CONVERSATION_ID]"}'`
@@ -62,16 +63,17 @@ At the end of every conversational turn:
 ## 🧪 Verifying the Setup
 
 ### Test 1: Check Mode (Struggle Detection)
-Ensure the matching engine successfully reads a transcript log and retrieves database matches:
+Ensure the matching engine successfully retrieves database matches when triggered with direct inputs from the reflections agent:
 ```bash
 npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
   --mode check \
-  --transcript "fake-app-data/brain/6064755a-78dd-46fb-9b36-c642feccda54/.system_generated/logs/transcript.jsonl" \
+  --type "ERROR-CODE" \
+  --struggle "My database keeps hallucinating ChatGPT layouts" \
   --workspace-root "./"
 ```
 *Expected Output:*
-- Displays the detected compiler error or user frustration.
-- Prints the top 3 similar case studies from the database with match scores.
+- Displays the received error details.
+- Prints the top similar case studies from the database with match scores.
 
 ### Test 2: Log Mode (Reflection Committing)
 Test inserting a new resolved struggle back to the SQLite learnings index:

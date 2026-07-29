@@ -1,0 +1,64 @@
+# Research Thesis Evolution
+
+This log tracks the evolution of the project's research positioning, logging major cycles of feedback, decisions, and shifts in the thesis.
+
+## Cycle 1: Mapping Relevant Research Threads
+**Date:** 2026-07-09
+
+### User Feedback & Critique
+- **Thread 1 (Implicit Learner-Sourcing):** The user requested help finding starting points and resources to begin looking into this thread.
+- **Thread 2 (Situated Scaffolding):** The user emphasized a focus on enabling users to contribute while learning, contrasting this with toy assignments where answers are predefined. Using the MCP server in a changing codebase allows users to learn by doing and recognize their own gaps. Rather than asking an agent to solve the issue or struggling to find relevant content, the MCP server provides tools for in-the-moment learning, bypassing prestructured guides that may teach irrelevant content.
+- **Thread 3 (Conversational-UX):** The user agreed that the core tension is about reliance on AI and skimming over learning resources, leading to shallow understanding. The user asked for resources to clarify what the field currently agrees on and what remains untested.
+
+### Actions Taken
+- **Threads 1 & 3:** Added Deferred Issues to the Appendix in `research-thesis.md` indicating the need for further literature review (finding starting points and identifying field consensus vs. untested areas).
+- **Thread 2:** Integrated the user's perspective into the "Just-in-Time Scaffolding" thread in `research-thesis.md`, specifically highlighting the shift toward authentic learning by doing in a changing codebase versus predefined toy assignments.
+
+### State Changes
+- Overwrote the previous research landscape with the new `research-thesis.md`.
+- Reset `research-thesis-evolution.md` for this new landscape and logged Cycle 1 feedback.
+- Added Deferred Issues to the Appendix for further reading.
+
+## Cycle 2: Refining Research Threads
+**Date:** 2026-07-09
+
+### User Feedback & Critique
+- **Thread 1 Replacement:** The user requested replacing the "Implicit Learner-Sourcing" thread with a focus on "Top-Down Expert scaffolding vs Bottom-Up Telemetry Curation". They noted this helps bypass expert blind spots by using IDE telemetry to audit, evaluate, and restructure subgoals.
+- **Thread 3 Exploration:** The user expressed uncertainty about the AI Reliance thread and asked to explore other tensions around the idea of learner-sourcing.
+
+### Actions Taken
+- **Thread 1:** Updated `research-thesis.md` to reframe Thread 1 entirely around Top-Down vs Bottom-Up scaffolding curation via telemetry.
+- **Thread 3:** Presented the user with alternative learner-sourcing tensions (Explicit vs Implicit burden, Crowdsourced vs Expert Validation, Sense-Making vs Solution-Providing) to choose a new direction for Thread 3.
+
+## Cycle 3: Locking in Thread 3
+**Date:** 2026-07-09
+
+### User Feedback & Critique
+- **Thread 3 Validation:** The user agreed to proceed with the recommendation for Option C: "The Dual-Purpose Intervention (System Auditing vs. Individual Scaffolding)". They concurred that this successfully bridges Thread 1 (telemetry gap auditing) and Thread 2 (JIT scaffolding).
+
+### Actions Taken
+- **Thread 3:** Updated `research-thesis.md` to reframe Thread 3 around the tension of balancing the learner's need for JIT scaffolding against the system's need for authentic struggle to generate telemetry.
+- **State Changes:** Removed the Deferred Issues for Threads 1 and 3 from the Appendix, as all three threads are now solidly defined.
+
+## Cycle 4: Refining Theory Recommendations
+**Date:** 2026-07-09
+
+### User Feedback & Critique
+- **Cognitive Apprenticeship Critique:** The user clarified that the MCP server does not *model* code writing. Instead, it identifies micro-roles and subgoals, directing the user to JIT scaffolding to learn concepts relevant to their immediate problem.
+- **Knowledge Building Critique:** The user clarified that students *do* exhibit intentionality, but at an individual level: they use a conversational guide tool to highlight confusing parts for themselves, which in turn updates the global guide for everyone.
+
+### Actions Taken
+- **Theory 1 (Scaffolding):** Replaced Cognitive Apprenticeship with "Scaffolding and the Zone of Proximal Development (Wood, Bruner, & Ross; Vygotsky)". This perfectly models the AI as a "more knowledgeable other" diagnosing the ZPD edge and routing to resources without modeling the solution.
+- **Theory 2 (Knowledge Building):** Retained Knowledge Building but reframed it as "Intentional Learner-Sourcing via the Guide Update Loop" to explicitly map to the conversational guide tool's mechanism.
+- **Theoretical Bridge:** Added an explanation of how the theories connect: ZPD/Scaffolding explains the *routing* trigger from the open-ended repository to the walkthrough, while Knowledge Building explains the *refinement* of the walkthrough. The bridge is the structural telemetry generated by this jump, which allows the system to rearrange linear subgoals into a dynamic dependency graph based on authentic implementation paths.
+
+## Cycle 5: Refining Gaps & Opportunities
+**Date:** 2026-07-09
+
+### User Feedback & Critique
+- **Critique 1 (Significance of Gap 1):** The user emphasized that expert-designed curricula often group similar concepts, meaning users might learn ideas long before needing them. Without understanding the specific context of application (e.g., when to use a batchwrite versus other database update methods), users can apply the wrong subgoals. This wastes time, makes users feel helpless in their learning, and ultimately pushes them toward over-relying on AI agents to code for them.
+- **Critique 2 (Methodological Alignment of Gap 2):** The user opted to defer determining the methodological alignment for now, preferring to keep it open for ideation.
+
+### Actions Taken
+- **Gap 1:** The significance of Gap 1 was updated in `research-thesis.md` to highlight the negative outcomes (wasted time, helplessness, and AI over-reliance) caused by prematurely learning out-of-context concepts.
+- **Gap 2:** Methodological alignment for Gap 2 is deferred and left open for future ideation.
