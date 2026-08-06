@@ -1,54 +1,92 @@
 # Protostudy 1 Instruments — MVP 1: Manual Sharing Probe
 
-This companion document holds the operational detail for data collection for MVP 1. It details the forms, surveys, and manual verification protocols used to test error overlap and peer logs value.
+This companion document holds the operational detail for data collection for MVP 1. It details the Google Sheet row structure, weekly updates reporting template, and exit interview questions.
 
 **Main doc:** [protostudy-1.md](./protostudy-1.md)
 
 ---
 
-## 📋 Surveys & Forms
+## 📖 Participant Onboarding Instructions
+*(Send this text directly to Team A and Team B members via Slack or email before the study begins)*
 
-### 1. Pre-Study Survey (Baseline Behaviors)
-* **Form URL**: [https://forms.gle/GeKiR8FdNY1vjbqE8](https://forms.gle/GeKiR8FdNY1vjbqE8)
-* **Timing**: Administered once to each participant before they begin the study.
-* **Core Lenses**:
-  - Primary agent tasks and frameworks.
-  - Subjective assessment of agent-steering competency.
-  - Frequency of "stuck cycles."
-  - Help-seeking preferences (asking peers, coordinators, search).
+### Welcome to the SkillWeave Pilot!
+We are running a 1-week pilot to see how we can share agent-steering struggles and fixes across the lab cohort. 
 
-### 2. During-Use / Incident Logging Survey (Usage Form)
-* **Form URL**: [https://forms.gle/3F4GkdkBAgjuzuoFA](https://forms.gle/3F4GkdkBAgjuzuoFA)
-* **Timing**: Builders fill this out:
-  1. Whenever they hit an agent-steering roadblock (to log the struggle).
-  2. Whenever they use a peer's logged solution to unblock themselves (to log match utility).
-* **Core Questions**:
-  - Roadblock description and error messages.
-  - Resolution strategy (how they steered the agent to fix it).
-  - Subjective rating of peer log relevance.
+#### 1. What counts as a struggle?
+You should log a row in the Google Sheet whenever you hit at least one of these criteria:
+* **Prompt Loop**: You prompt your AI agent $\geq 3$ consecutive times to fix the exact same compile error or logic bug.
+* **Time Stuck**: You spend $\geq 5\text{ to }10\text{ minutes}$ trying to troubleshoot a single agent-generated issue.
+* **Reversion**: You discard the agent's changes entirely and revert your code back.
 
-### 3. Post-Study Survey (Evaluation)
-* **Form URL**: [https://forms.gle/wWTrsB4VGiJSM7ac8](https://forms.gle/wWTrsB4VGiJSM7ac8)
-* **Timing**: Administered once at the end of the study.
-* **Core Lenses**:
-  - Perceived value of the shared logs folder.
-  - Likelihood of checking peer logs before asking coordinators.
-  - Subjective change in agent steering awareness.
+#### 2. Your Workflow
+1. **Get Stuck**: You hit a struggle matching the criteria above.
+2. **Search**: Open the **[Shared Google Sheet Link]** and search (`Cmd+F`) for keywords relating to your roadblock (e.g. "signals", "firebase").
+3. **If you find a peer fix**: Apply their prompt fix. If it works, **do not write a new row**. Simply add your name and date inside their row's **`Helpful Matches (Who used this?)`** column.
+4. **If you find nothing**: Resolve the issue yourself. Once resolved, **add a new row** to the bottom of the Sheet documenting your roadblock, your successful fix prompts, and a quick 2-sentence reflection.
+
+#### 3. Getting Help
+* If you have technical coding questions, search the Google Sheet or troubleshoot.
+* If you have clarifying questions about how to use this Google Sheet, what to log, or hit system access issues, DM **[Coordinator Name]** directly on Slack!
+
+---
+
+## 📊 Shared Google Sheet Log Structure
+
+The central spreadsheet is created in a shared Google Drive folder accessible to Team A and Team B. 
+
+### Columns:
+1. **Timestamp**: Generated automatically on row insertion.
+2. **Author**: Name of the developer logging the struggle.
+3. **Team**: Team A or Team B.
+4. **Project/Area**: e.g., Angular signals component, Firestore security rules.
+5. **The Roadblock**: Raw error message, console log, or traceback, plus a description of the agent-steering loop.
+6. **The Steer Fix**: The successful prompt adjustment, prompt sequence, or code diff that resolved the issue.
+7. **2-Sentence Reflection**: A mandatory 2-sentence reflection on what they learned.
+8. **Helpful Matches (Who used this?)**: If a peer uses your row to resolve their roadblock, they append their name/initials and date here (e.g., "Developer B - Aug 12"). This allows us to track search success rate (H3) without creating duplicate error entries.
+
+---
+
+## 🎙️ Weekly Update Self-Report Template
+
+Participants include this lightweight status section in their weekly written updates:
+
+```markdown
+### SkillWeave MVP 1 Tracking
+* Number of roadblocks hit this week: [Count]
+* Did you check the shared Google Sheet when stuck? [Yes/No/How often]
+* Did a teammate's logged fix help you resolve a roadblock? [Yes (describe)/No]
+* Did you log your resolved roadblocks in the sheet? [Yes (link cases)/No (why)]
+```
 
 ---
 
 ## 🎙️ Exit Interview Guide
-A 10-minute debrief at the end of the study.
+A 10-minute debrief at the end of the 1-week pilot.
 
 ### Questions:
-1. "When you got stuck this week, did you check the shared peer struggles document? Why or why not?"
-2. "Was there a specific time where a peer's logged struggle helped you resolve your own issue? Describe it."
-3. "How did it feel having to manually copy-paste your struggles and fixes into the Google Form? Did it disrupt your coding flow?"
+1. "When you got stuck on your project this week, did you check the shared Google Sheet? Why or why not?"
+2. "Was there a specific incident where a teammate's logged struggle helped you resolve your own issue? Describe it."
+3. "How did it feel having to manually copy-paste your raw error, prompt adjustment, and 2-sentence reflection into a spreadsheet row? Did it disrupt your coding flow?"
+4. "Where did you find yourself cutting corners in the sheet (e.g. leaving the reflection blank, omitting raw tracebacks)?"
 
 ---
 
-## 🛠️ Manual Verification & Coordination Protocol
+## 🔍 Coordinator Audit Protocol
 Because we are running a no-code probe:
-1. **End-of-Day Sync**: The coordinator reviews all responses in the Usage Form spreadsheet at 6:00 PM PST.
-2. **Digest Generation**: The coordinator compiles new struggles and fixes into a clean, searchable markdown file (`docs-plans/protostudy-1/shared-peer-logs.md`) inside the shared repository.
-3. **Daily Alert**: The coordinator sends a Slack message to the lab cohort summarizing the new cases: *"Teammate A resolved a Firestore claims error; Teammate B fixed an Angular signals reactivity bug. Check the shared-peer-logs.md file for their prompt fixes!"*
+1. **Google Sheets Version History Audit**: Every Friday, the coordinator audits the Sheet using the Google Sheets Version History and Activity Dashboard to count:
+   - Total logged rows.
+   - Compliance rate per participant.
+   - Sheet view logs (who opened the sheet and when).
+2. **Technical Overlap Matching**: The coordinator reviews all resolved errors in the spreadsheet, groups them by categories (e.g. Firebase, Angular reactivity, Agent file path errors), and calculates:
+   $$\text{Overlap Rate} = \frac{\text{Number of Overlapping Roadblocks}}{\text{Total Roadblocks logged}} \times 100\%$$
+
+---
+
+## 📊 Concrete Google Sheet Mockup Example
+
+This is a visual blueprint of the columns and rows configured in the shared Google Sheet:
+
+| Timestamp | Author | Team | Project / Area | The Roadblock (Error / Friction) | The Steer Fix (Prompts / Diff) | 2-Sentence Reflection | Helpful Matches (Who used this?) |
+|---|---|---|---|---|---|---|---|
+| 2026-08-10 14:15 | Developer A | Team A | Angular Reactivity | **Infinite digest loop**. The agent kept rewriting template click bindings but failed to see circular dependencies in active signals. | I prompted: *"Stop using template bindings to trigger side-effects. Use effect() in the TS component file."* | Agents struggle to track implicit dependencies inside HTML templates. Moving reactivity explicitly to TS files makes the dependency graph visible to the context window. | **Developer C (Aug 11)**, <br>**Developer B (Aug 13)** |
+| 2026-08-11 10:20 | Developer B | Team B | Firebase Rules | **Insufficient Permissions Error**. Firestore rules blocked `get()` queries. Agent suggested disabling rules which I rejected. | I prompted: *"Write a security rule for match /docs/{docId} that checks request.auth != null."* | Firestore rules require client-side queries to match rule filters exactly. If rules require auth, you must pass the auth context in the client query or it will auto-reject. | *[Leave blank if no matches yet]* |

@@ -36,7 +36,7 @@ How users interpret and interact with the design — the design conjectures and 
 The deeper psychological and behavioral changes we hope to produce — the theoretical conjectures and the actual community impact we're striving for.
 
 7. **H7: Steering Competency Transfer** *(Prediction — MVP 3).* Using SkillWeave increases cohort members' independence, letting them resolve *new, unseen* agent steering bottlenecks (conceptual, design, or technical) with fewer stuck cycles over time. *Why it matters if wrong:* If builders only learn how to copy specific recipes rather than building general agent-steering mental models, the long-term competence value is lost.
-8. **H8: Double-Loop Optimization** *(Prediction — MVP 3).* Aggregating individual friction reports allows coordinators to successfully identify and fix structural flaws in the shared workflow templates, reducing overall cohort error rates. *Why it matters if wrong:* If coordinators ignore dashboard suggestions or if template updates fail to reduce subsequent errors, the double-loop optimization fails.
+8. **H8: Cohort-Wide Process Adaptation** *(Prediction — MVP 3).* Aggregating individual friction reports allows coordinators to identify common roadblocks across the cohort and optimize team support resources, reducing overall stuck velocity. *Why it matters if wrong:* If coordinators cannot extract actionable cohort insights from the aggregated reports, the community-level value of the telemetry collapses.
 
 ---
 
@@ -56,7 +56,61 @@ Does constraining assistant outputs and aggregating transcripts successfully dri
 
 1. **Cognitive Offloading Predominance** — Planners and designers prioritize execution speed over learning, writing low-effort gibberish reflections to bypass triggers.
 2. **Context Loss in Synthesis** — The LLM-generated Socratic Pivot Highlights fail to capture the necessary tacit context, forcing members to read raw logs (nullifying streamlining).
-3. **Double-Loop Failure** — Lab coordinators do not update shared methodologies because aggregated reflections fail to expose structural flaws.
+3. **Dashboard Insignificance** — Lab coordinators do not utilize the aggregated telemetry because the compiled summaries fail to expose actionable common roadblocks.
+
+### Summer Cohort Study Allocation Plan (~10 People, 3 Teams)
+
+For small cohort environments (e.g., a summer research cohort consisting of ~10 members across 3 teams: Team A, Team B, and Team C), participants are rationed progressively to preserve an unbiased "novice" comparison group for learning transfer evaluation:
+
+*Note: If your Markdown previewer does not render the visual Mermaid diagram below, reference this text-art flowchart:*
+
+```text
+┌──────────────────────────────────────────────┐
+│             MVP 1 (Manual Probe)             │
+│  [Team A (approx 3)]  │  [Team B (approx 3)] │
+│  (Test: Overlap)      │  (Test: Overlap)     │
+└──────────┬────────────┴──────────┬───────────┘
+           │                       │
+           ▼                       ▼
+┌──────────────────────────────────────────────┐
+│           MVP 2 (Chat Companion)             │
+│  [Team C (2 fresh)]   │  [Team A] │ [Team B] │
+│  (Test: Constraints)  │  (Test: UI Usability)│
+└──────────┬────────────┴──────────┬───────────┘
+           │                       │
+           ▼                       ▼
+┌──────────────────────────────────────────────┐
+│             MVP 3 (Full Deploy)              │
+│  [Team C (All)]       │  [Team A] │ [Team B] │
+│  (Test: Transfer)     │  (Test: Long-term)   │
+└──────────────────────────────────────────────┘
+```
+
+```mermaid
+graph TD
+    subgraph MVP1["MVP 1: Manual Probe"]
+        T1["Team A (approx 3 people)"]
+        T2["Team B (approx 3 people)"]
+    end
+    subgraph MVP2["MVP 2: Chat Companion"]
+        T1_2["Team A"]
+        T2_2["Team B"]
+        T3_1["Team C (2 fresh members)"]
+    end
+    subgraph MVP3["MVP 3: Full Deploy"]
+        T1_3["Team A"]
+        T2_3["Team B"]
+        T3_3["Team C (All members)"]
+    end
+
+    T1 --> T1_2
+    T2 --> T2_2
+    T3_1 --> T3_3
+```
+
+*   **MVP 1 (Manual Probe):** Deployed only to **Team A and Team B** (~6 people). Team C is held back as a clean control group. We audit the manual logs to verify roadblock overlap across different project teams.
+*   **MVP 2 (Streamlined Chat Companion):** Deployed to **Team A and Team B** (the 6 veterans, to get comparative usability feedback) plus **2 fresh members of Team C** (to observe how a first-time user reacts to the interface constraints).
+*   **MVP 3 (Full Deploy):** Deployed to **all 3 teams** (entire 10-person cohort). Team C's remaining members act as the clean baseline group to measure steering competency transfer.
 
 ### Timeline
 
@@ -66,7 +120,7 @@ We will deploy our validation sequence across the project teams in our research 
 |---|---|---|---|
 | MVP 1: Manual Sharing Probe | [Date] | Deploy a shared Google Drive/GitHub folder where 3 teams manually copy-paste resolved bottlenecks and 2-sentence prompt fixes. | H1 (Error/friction overlap) and H3 (Value of peer logs). |
 | MVP 2: Streamlined Chat Companion | [Date] | Deploy in-chat companion rules and background checking modes, rendering cards as system markdown files (`peer_suggestion_card.md`) in the right-side Artifacts panel for 10 cohort members. | H2 (Breakdown signals), H4 (Scaffolding adoption), and H5 (Auxiliary pane usability). |
-| MVP 3: Full SkillWeave Deploy | [Date] | Deploy full integration (persistent confirmation cards inside the chat panel, automated transcript-preview scanner, 2-question reflection prompts, real-time seeder writes, and coordinator template PRs) across the entire lab cohort. | H6 (Summary preview engagement), H7 (Competency transfer), and H8 (Double-loop learning). |
+| MVP 3: Full SkillWeave Deploy | [Date] | Deploy full integration (persistent confirmation cards inside the chat panel, automated transcript-preview scanner, 2-question reflection prompts, real-time seeder writes, and cohort knowledge sharing) across the entire lab cohort. | H6 (Summary preview engagement), H7 (Competency transfer), and H8 (Cohort process adaptation). |
 
 ### MVP 1: Manual Sharing Probe (No-Code)
 
@@ -107,7 +161,7 @@ Deploy to 10 cohort members. We track:
 
 ### MVP 3: Full SkillWeave Deploy (Integrated System)
 
-**Purpose:** Evaluate learning outcomes (reflection quality under preview transparency and competency transfer) and cohort double-loop optimization. *(Addresses: H6 [Summary Preview and 2-Question Reflection], H7 [Steering Competency Transfer], H8 [Double-Loop Optimization])*
+**Purpose:** Evaluate learning outcomes (reflection quality under preview transparency and competency transfer) and cohort-wide process adaptation. *(Addresses: H6 [Summary Preview and 2-Question Reflection], H7 [Steering Competency Transfer], H8 [Cohort-Wide Process Adaptation])*
 
 **What we build:**
 The complete integrated system:
@@ -115,13 +169,13 @@ The complete integrated system:
 - Real-time preview generation which scans the conversation transcript logs from bottom to top to identify the recent struggle and modified files.
 - Simplified 2-question reflection toast inside the chat interface.
 - Logging modes (`--mode log` invoked in the background) that update the local SQLite database and perform real-time write-backs to `peer-struggles.json`.
-- Git-based push/pull syncing and coordinator dashboard for double-loop template optimization.
+- Git-based push/pull syncing and a shared cohort-wide knowledge dashboard to display friction patterns.
 
 **How we learn:**
 Deploy across the entire lab cohort (20+ members) during a 6-week sprint. We collect:
 - Reflection logs to evaluate prompt quality scores over time.
 - Transfer tests: we evaluate members on new, unseen agent steering tasks (conceptual planning or technical coding) to measure stuck-cycles and resolution time.
-- Coordinator interviews: we track the adoption and acceptance rate of automated template PR recommendations.
+- Coordinator interviews: we track how coordinators use the dashboard to identify common roadblocks and adapt support resources.
 
 → Detailed plan: *to be created via /protostudy-prep*
 
