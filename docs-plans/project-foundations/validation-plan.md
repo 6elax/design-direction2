@@ -60,89 +60,42 @@ Does constraining assistant outputs and aggregating transcripts successfully dri
 
 ### Summer Cohort Study Allocation Plan (~10 People, 3 Teams)
 
-For small cohort environments (e.g., a summer research cohort consisting of ~10 members across 3 teams: Team A, Team B, and Team C), participants are rationed progressively to preserve an unbiased "novice" comparison group for learning transfer evaluation:
+For small cohort environments (e.g., a summer research cohort consisting of ~10 members across 3 teams), participants are allocated progressively across the evaluation phases:
 
-*Note: If your Markdown previewer does not render the visual Mermaid diagram below, reference this text-art flowchart:*
-
-```text
-┌──────────────────────────────────────────────┐
-│             MVP 1 (Manual Probe)             │
-│  [Team A (approx 3)]  │  [Team B (approx 3)] │
-│  (Test: Overlap)      │  (Test: Overlap)     │
-└──────────┬────────────┴──────────┬───────────┘
-           │                       │
-           ▼                       ▼
-┌──────────────────────────────────────────────┐
-│           MVP 2 (Chat Companion)             │
-│  [Team C (2 fresh)]   │  [Team A] │ [Team B] │
-│  (Test: Constraints)  │  (Test: UI Usability)│
-└──────────┬────────────┴──────────┬───────────┘
-           │                       │
-           ▼                       ▼
-┌──────────────────────────────────────────────┐
-│             MVP 3 (Full Deploy)              │
-│  [Team C (All)]       │  [Team A] │ [Team B] │
-│  (Test: Transfer)     │  (Test: Long-term)   │
-└──────────────────────────────────────────────┘
-```
-
-```mermaid
-graph TD
-    subgraph MVP1["MVP 1: Manual Probe"]
-        T1["Team A (approx 3 people)"]
-        T2["Team B (approx 3 people)"]
-    end
-    subgraph MVP2["MVP 2: Chat Companion"]
-        T1_2["Team A"]
-        T2_2["Team B"]
-        T3_1["Team C (2 fresh members)"]
-    end
-    subgraph MVP3["MVP 3: Full Deploy"]
-        T1_3["Team A"]
-        T2_3["Team B"]
-        T3_3["Team C (All members)"]
-    end
-
-    T1 --> T1_2
-    T2 --> T2_2
-    T3_1 --> T3_3
-```
-
-*   **MVP 1 (Manual Probe):** Deployed only to **Team A and Team B** (~6 people). Team C is held back as a clean control group. We audit the manual logs to verify roadblock overlap across different project teams.
-*   **MVP 2 (Streamlined Chat Companion):** Deployed to **Team A and Team B** (the 6 veterans, to get comparative usability feedback) plus **2 fresh members of Team C** (to observe how a first-time user reacts to the interface constraints).
-*   **MVP 3 (Full Deploy):** Deployed to **all 3 teams** (entire 10-person cohort). Team C's remaining members act as the clean baseline group to measure steering competency transfer.
+*   **MVP 1 (Retrospective Evaluation):** Evaluated against **all cohort members** (~10 people). We parse and synthesize historical logs from previous quarters/weeks (Iris, Alexis, Varia, etc.) into a master spreadsheet. We verify accuracy with the original authors and run cross-reading helpfulness evaluations with the rest of the cohort.
+*   **MVP 2 (Streamlined Chat Companion Prototype):** Deployed to **all active teams** (~10 people) during a real coding sprint. Because generating the companion rules and system cards is rapid, we skip manual live-logging and immediately test the Socratic interface constraints, auxiliary pane layout, and live telemetry capture.
+*   **MVP 3 (Full Deploy):** Deployed to **all active teams** (entire 10-person cohort) to measure steering competency transfer and cohort-wide process adaptation over a multi-week deployment.
 
 ### Timeline
 
-We will deploy our validation sequence across the project teams in our research lab. We start with a no-code manual probe to test the overlap hypothesis, scale to a low-code chat companion prototype to test scaffolding interfaces, and finally deploy the integrated system to study learning outcomes.
+We will deploy our validation sequence across the project teams in our research lab. We start with a retrospective database audit to test the overlap and synthesis hypotheses, scale to a streamlined chat companion prototype to test interface constraints, and finally deploy the integrated system to study long-term outcomes.
 
 | Phase | Target Date | What Happens | What We Learn |
 |---|---|---|---|
-| MVP 1: Manual Sharing Probe | [Date] | Deploy a shared Google Drive/GitHub folder where 3 teams manually copy-paste resolved bottlenecks and 2-sentence prompt fixes. | H1 (Error/friction overlap) and H3 (Value of peer logs). |
-| MVP 2: Streamlined Chat Companion | [Date] | Deploy in-chat companion rules and background checking modes, rendering cards as system markdown files (`peer_suggestion_card.md`) in the right-side Artifacts panel for 10 cohort members. | H2 (Breakdown signals), H4 (Scaffolding adoption), and H5 (Auxiliary pane usability). |
+| MVP 1: Retrospective Evaluation | [Date] | Extract historical struggles into a master spreadsheet. Verify accuracy with authors and run cohort cross-reading helpfulness evaluations. | H1 (Roadblock/friction overlap) and H3 (Value of peer logs). |
+| MVP 2: Streamlined Chat Companion | [Date] | Deploy in-chat companion rules and background checking modes, rendering inline suggestion cards in the right-side Artifacts panel for all cohort members. | H2 (Breakdown signals), H4 (Scaffolding adoption), and H5 (Auxiliary pane usability). |
 | MVP 3: Full SkillWeave Deploy | [Date] | Deploy full integration (persistent confirmation cards inside the chat panel, automated transcript-preview scanner, 2-question reflection prompts, real-time seeder writes, and cohort knowledge sharing) across the entire lab cohort. | H6 (Summary preview engagement), H7 (Competency transfer), and H8 (Cohort process adaptation). |
 
-### MVP 1: Manual Sharing Probe (No-Code)
+### MVP 1: Retrospective Database Evaluation (No-Code Probe)
 
-**Purpose:** De-risk the foundational assumption that teams hit overlapping errors and will actively read peer logs before building any automated infrastructure. *(Addresses: H1 [Error & Friction Overlap], H3 [Value of Peer Dialogue])*
+**Purpose:** De-risk the foundational assumption that cohort members encounter overlapping roadblocks and will find peer dialogue/Socratic summaries helpful, using historical logs to bypass live-logging compliance issues. *(Addresses: H1 [Error & Friction Overlap], H3 [Value of Peer Dialogue])*
 
 **What we build:**
-Zero custom code. We create:
-- A shared Google Drive folder or a designated repo directory.
-- A basic, 1-page template where members copy-paste: (1) their raw error or roadblock log, (2) their successful prompt adjustment, and (3) a 2-sentence reflection on what they learned.
-- We mandate that when members get stuck, they must check this shared directory first.
+No custom runtime code. We build:
+- A master **Historical Struggles Registry** spreadsheet (`historical-struggles-registry.md`) compiling struggles, resolutions, prompt fixes, and Socratic contrast questions extracted from previous student chat logs.
+- Short author-verification surveys and peer cross-reading interview guides.
 
 **How we learn:**
-We deploy this for 2 weeks across 3 active lab teams. We collect:
-- Access logs / document view history of the shared folder.
-- Self-reports: did they find a peer log? Did it help them resolve their issue?
-- Researcher audit: we analyze their resolved issues to calculate the percentage of technical and conceptual overlap between different teams.
+We execute the study in three sequential steps:
+1.  **Ingestion:** Extract at least 3-5 distinct struggles from historical chatlogs (e.g. Alexis, Iris, Varia).
+2.  **Author Review:** Present the extracted entries to the original authors. We ask: (a) *Does this summary accurately capture your roadblock and fix?* (b) *Can you write a short reflection on the trade-offs of your resolution?*
+3.  **Cohort Cross-Evaluation:** Show the aggregated spreadsheet to the rest of the cohort. We ask: (a) *Would any of these peer logs have helped you when you encountered similar roadblocks?* (b) *Does the Socratic question guide make sense to you?*
 
-→ Detailed plan: *to be created via /protostudy-prep*
+→ Detailed plan: [protostudy-1.md](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/protostudy-1/protostudy-1.md)
 
 ### MVP 2: Streamlined Chat Companion (Low-Code)
 
-**Purpose:** Validate whether users will accept a constrained diagnostic agent (no direct answer generation) and if the right-side Auxiliary Pane provides a seamless split-view experience. *(Addresses: H2 [Steering Breakdown Signal], H4 [Scaffolding vs. Direct Answers], H5 [Auxiliary Pane Usability])*
+**Purpose:** Validate whether users will accept a constrained diagnostic agent (no direct answer generation) and if the right-side Auxiliary Pane provides a seamless split-view experience during live workflows. *(Addresses: H2 [Steering Breakdown Signal], H4 [Scaffolding vs. Direct Answers], H5 [Auxiliary Pane Usability])*
 
 **What we build:**
 A lightweight in-chat companion prototype:
@@ -152,7 +105,7 @@ A lightweight in-chat companion prototype:
 - Telemetry logging: we log typing speed, idle time, and error/friction frequencies to map breakdown signals.
 
 **How we learn:**
-Deploy to 10 cohort members. We track:
+Deploy to all active cohort members. We track:
 - Invocations: how often do they click the redirect link in the suggestion card?
 - Navigation: how often do they reference the auxiliary pane during troubleshooting?
 - Exit Interviews: we interview members about the cognitive friction of being guided instead of given direct answers, and whether the side-by-side markdown panels felt natural.
