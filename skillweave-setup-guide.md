@@ -7,7 +7,7 @@ SkillWeave runs as a background chat skill agent (similar to the `agent-reflecti
 ---
 
 ## 📋 Prerequisites
-- **Node.js:** Version `v22.5.0` or higher (required for native `node:sqlite` database support).
+- **Node.js:** Version `v22.5.0` or higher.
 - **Workspace Tooling:** Bun or TSX (`npx tsx`) to run TypeScript scripts in the environment.
 
 ---
@@ -21,18 +21,19 @@ Ensure the following files are copied into your repository's local configuration
 
 ---
 
-### Step 2: Initialize the Local SQLite Database
-To set up the local database cache:
-1.  Initialize the `.t4g` folder and the `agent-memory.db` file by running:
-    ```bash
-    bun run skills/agent-reflections/scripts/init-local-db.ts --workspace-root "/path/to/your-repo"
-    ```
-2.  This generates a persistent UUID for your project in the SQLite database and adds `.t4g/` to the project's `.gitignore` to prevent committing lock files.
+### Step 2: Configure Supabase Credentials
+To set up access to the shared cloud database:
+1. Ensure the following environment variables are set in your environment (e.g. in your `.env` file at the workspace root):
+   ```env
+   SUPABASE_URL="https://your-project-id.supabase.co"
+   SUPABASE_KEY="your-anon-or-service-role-key"
+   ```
+2. The `skill-weave-agent.ts` script automatically loads these credentials to connect to the central DB.
 
 ---
 
-### Step 3: Seed the Database with Peer Cases (Optional)
-To pre-populate the database with the baseline peer struggle analysis dataset (e.g. from Causeway and AlignDraft):
+### Step 3: Seed the Cloud Database with Peer Cases (Optional)
+To pre-populate the cloud database with the baseline peer struggle analysis dataset (e.g. from Causeway and AlignDraft):
 1.  Create a temporary script `scripts/feed-database.ts` that inserts your peer learnings.
 2.  Run the seed script:
     ```bash
@@ -76,7 +77,7 @@ npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
 - Prints the top similar case studies from the database with match scores.
 
 ### Test 2: Log Mode (Reflection Committing)
-Test inserting a new resolved struggle back to the SQLite learnings index:
+Test inserting a new resolved struggle back to the cloud learnings index:
 ```bash
 npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
   --mode log \

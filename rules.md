@@ -10,6 +10,5 @@ At the end of every conversational turn:
 4. Upon task resolution (user clicks "Resolved" on the persistent confirmation card):
    - Print a brief summary preview of the logged data in the chat panel (struggle details, modified files, and key dialogue turns).
    - Prompt the user with the 2-question reflection toast.
-   - Commit the reflection back to the DB:
+   - Commit the reflection back to the cloud DB:
      `npx tsx /Users/alexisluo/tech4good/skills/plugins-in-progress/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts --mode log --workspace-root "<project-root>" --payload '{"type":"[TYPE]","key":"[KEY]","insight":"[INSIGHT]","example":"[EXAMPLE]","conversation-id":"[CONVERSATION_ID]"}'`
-

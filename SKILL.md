@@ -5,7 +5,7 @@ description: A collaborative metacognitive agent telemetry tool that retrieves, 
 
 # SkillWeave
 
-**SkillWeave** is an agentic telemetry and collaborative learning companion. It captures the logs, workspace diffs, and developer reflections from team members steering AI agents, indexes them in a local-first peer database, and surfaces them as Socratic guideposts when another teammate gets stuck on similar coding, design, or architectural problems.
+**SkillWeave** is an agentic telemetry and collaborative learning companion. It captures the logs, workspace diffs, and developer reflections from team members steering AI agents, indexes them in a shared cloud database (Supabase), and surfaces them as Socratic guideposts when another teammate gets stuck on similar coding, design, or architectural problems.
 
 Unlike standard autocomplete or code search, SkillWeave does **not** copy-paste or spoon-feed solutions. Instead, it exposes peer struggles as **conceptual contrast cases**, helping developers develop independent mental models and steering patterns.
 
@@ -76,7 +76,7 @@ graph TD
     C -->|Success| D[Run Regex Credential Sanitizer]
     C -->|Failure| A
     D -->|Sanitized| E[Prompt Post-Session Reflection]
-    E --> F[Commit to Local Cache & Sync]
+    E --> F[Commit to Cloud Database]
 ```
 
 1.  **Micro-Toast Gate:** When the system detects a resolved struggle (indicated by user statement or positive code compile shared in chat), a popup appears above the chat input:
@@ -99,14 +99,14 @@ SkillWeave triggers directly at the end of a conversational turn, integrating wi
       --struggle "[STRUGGLE_TEXT]" \
       --workspace-root "<WORKSPACE_ROOT>"
     ```
-3.  **Database Query & Matching:** SkillWeave performs a keyword-similarity search against the SQLite `.t4g/agent-memory.db` file to locate similar peer case studies.
+3.  **Database Query & Matching:** SkillWeave performs a keyword-similarity search directly against the remote Supabase database to locate similar peer case studies.
 4.  **Socratic Suggestion Card:** If a match is found (overlap count >= 1), prepend the Level 1 Inline suggestion card above the prompt input window. If the developer clicks `[🔍 Open Peer Workspace Pane]`, open the right-side split-pane view.
 
 ---
 
 ## 💾 Database Logging Pipeline
 
-When a developer indicates task completion (passing the NLU verification gate), prompt them with post-task reflections and log the entry back to the shared repository database:
+When a developer indicates task completion (passing the NLU verification gate), prompt them with post-task reflections and log the entry directly to the central Supabase cloud database:
 
 ```bash
 npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \

@@ -8,7 +8,7 @@
 
 **Launch**: August 15, 2026 | **Reflection**: August 29, 2026
 
-Before we can build an integrated, automated double-loop learning loop for the whole lab cohort, we need to test whether builders will adopt a constrained, Socratic diagnostic helper and if LLM timeline highlights preserve the necessary contextual details. We're building a local telemetry checker daemon, an Artifact-based suggestion card generator, and a local SQLite logging pipeline. We are collecting data through telemetry logs, a 3-part Google Forms survey sequence, and exit interviews to evaluate both scaffolding adoption and timeline usability.
+Before we can build an integrated, automated double-loop learning loop for the whole lab cohort, we need to test whether builders will adopt a constrained, Socratic diagnostic helper and if LLM timeline highlights preserve the necessary contextual details. We're building a local telemetry checker daemon, an Artifact-based suggestion card generator, and a cloud Supabase logging pipeline. We are collecting data through telemetry logs, a 3-part Google Forms survey sequence, and exit interviews to evaluate both scaffolding adoption and timeline usability.
 
 ### What We're Testing & Exploring
 
@@ -26,7 +26,7 @@ A lightweight local CLI prototype that watches active conversations and presents
 * **Telemetry Checker Daemon** — A background shell loop that matches typing speed and reversions, calling `skill-weave-agent --mode check` when a struggle pattern is detected.
 * **Artifact-Based Suggestion Card (Level 1)** — A script that outputs a markdown file (`peer_suggestion_card.md`) to the user's system artifacts directory, automatically loading a visual suggestion card inside Antigravity 2.0's HTML Auxiliary pane.
 * **Socratic Workspace Pane (Level 2)** — A local markdown file detailing peer reflections, code diffs, and contrast questions that opens in the right-side Artifacts panel when clicked.
-* **Soft Logging Database Pipeline** — A synced SQLite database and JSON seeder logging tool that supports optional/null Socratic reflection inputs.
+* **Soft Logging Database Pipeline** — A central cloud Supabase database logging tool that supports optional/null Socratic reflection inputs.
 
 ### How We're Collecting Data
 We will deploy the CLI tool to 10 student builders in our research lab for two weeks.
@@ -43,7 +43,7 @@ This round tests the Socratic intervention flow under a low-code infrastructure,
 ### Feature 1: Telemetry Checker Daemon
 A background monitoring script that runs in the student's project terminal to detect struggles.
 - **Idle & Reversion Watcher** — Tracks keyboard activity and file reversions, triggering a match check when a developer is idle for >3 minutes after a reversion.
-- **SQLite Database Query Engine** — Runs a keyword similarity check against the local `agent-memory.db` learnings table when a trigger fires.
+- **Cloud Database Query Engine** — Runs a keyword similarity check directly against the remote Supabase database learnings table when a trigger fires.
 
 ### Feature 2: Artifact-Based Suggestion Card (Level 1)
 Generates the visual suggestion card inside the app webview.

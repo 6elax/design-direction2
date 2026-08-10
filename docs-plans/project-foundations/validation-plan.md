@@ -99,12 +99,12 @@ We execute the study in three sequential steps:
 
 **What we build:**
 A lightweight in-chat companion prototype:
-- A background execution harness (`skill-weave-agent.ts`) invoked by chat hooks to run checking (`--mode check`), database pulls (`--mode pull`), and diagnostics status.
+- A background execution harness (`skill-weave-agent.ts`) invoked by chat hooks to run checking (`--mode check`) and logging (`--mode log`) against the remote Supabase database, and check diagnostics status.
 - Integration rules that write Level 1 Inline Cards (`peer_suggestion_card.md`) to the active conversation directory, prompting Antigravity 2.0 to open and render them in the right-side Artifacts panel.
 - Inside the card, clicking `[🔍 Open Peer Workspace Pane]` redirects the panel to render the peer's Socratic questions and file/prompt diffs side-by-side with the chat.
 - Telemetry logging: we log typing speed, idle time, and error/friction frequencies to map breakdown signals.
 
-**How we learn:**
+### How we learn:
 Deploy to all active cohort members. We track:
 - Invocations: how often do they click the redirect link in the suggestion card?
 - Navigation: how often do they reference the auxiliary pane during troubleshooting?
@@ -121,8 +121,8 @@ The complete integrated system:
 - Persistent confirmation cards in the chat pane that wait for a user's "Resolved" click.
 - Real-time preview generation which scans the conversation transcript logs from bottom to top to identify the recent struggle and modified files.
 - Simplified 2-question reflection toast inside the chat interface.
-- Logging modes (`--mode log` invoked in the background) that update the local SQLite database and perform real-time write-backs to `peer-struggles.json`.
-- Git-based push/pull syncing and a shared cohort-wide knowledge dashboard to display friction patterns.
+- Logging modes (`--mode log` invoked in the background) that write directly to the central cloud Supabase database.
+- A shared cohort-wide knowledge dashboard displaying friction patterns pulled from the cloud database.
 
 **How we learn:**
 Deploy across the entire lab cohort (20+ members) during a 6-week sprint. We collect:
