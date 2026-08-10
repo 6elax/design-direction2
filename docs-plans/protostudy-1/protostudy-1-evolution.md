@@ -231,3 +231,48 @@ Pivot from the automated CLI prototype plan (MVP 2) to a simplified, low-frictio
 
 ### What shifted
 - **Embedded Mockup Table**: Copied the visual mockup table representing the Google Sheet columns and mock rows directly into the instruments file as an operational reference.
+
+---
+
+## Cycle 11: Struggle Concrete Definitions and Critique Decisions
+
+### AI Critique
+1. 🚨 **Focal Parameter Ambiguity**: The term "struggle" remains abstract. We need to detail concrete developer struggles (API hallucinations, circular reactivity, prompt loops) and list non-examples (simple typos, single-prompt routine builds) to prevent logging clutter.
+
+### User Response
+> what is considered a "struggle"? what is enough of a "struggle" or "difficulty" or even "error" for users to log something in the spreadsheet manually? 
+> 
+> for critique 1, i don't think it's too much of a problem to worry about.
+> for critique 2, i think having open ended questions are better.
+
+### Document Delta
+| Section | Before (Cycle 10) | After (Cycle 11) |
+|---|---|---|
+| protostudy-1.md (Pre-Mortem) | General struggle triggers (loops, stuck time) | Added concrete struggle examples (hallucinations, circular signals) |
+| protostudy-1-instruments.md | Text triggers | Detailed concrete examples & explicit non-examples (typos, semicolons) |
+
+### What shifted
+- **Defined Concrete Struggle Guidelines**: Added explicit examples of what constitutes a struggle (API hallucinations, circular dependencies, loops) and what should *not* be logged (simple syntax typos, quick first-try successes).
+- **Approved Open-Ended Interviews**: Kept the qualitative, open-ended structure of the exit interview guide per the user's preference.
+- **Dismissed Telemetry Audit Sync**: Decided against adding complex Activity Log audit sync protocols, keeping coordinator audits lightweight.
+
+---
+
+## Cycle 12: Subjective Feeling Trigger vs. Strict Rules
+
+### AI Critique
+1. 🚨 **Rule Gating vs. Self-Reporting Friction**: Forcing builders to strictly match quantitative rules (like $\geq 3$ prompts or $\geq 5$ minutes) increases cognitive load and may lead to under-reporting.
+
+### User Response
+> I think I should have a list of instructions for what should be logged, or considered a struggle, right? 
+> this makes me think, should users know when to to log a struggle based on if it matches certain instructions? or should users just log/search things based on their own feeling of needing help/they themselves feel that they encountered a difficulty?
+
+### Document Delta
+| Section | Before (Cycle 11) | After (Cycle 12) |
+|---|---|---|
+| protostudy-1.md (Pre-Mortem) | Rule-based struggle triggers | Subjective feeling-based primary trigger; rules serve as supporting examples |
+| protostudy-1-instruments.md | Mandatory rule thresholds | Re-framed Section 1 to prioritize feeling of stuckness/friction |
+
+### What shifted
+- **Pivoted to Subjective Trigger**: Resolved the design trade-off by prioritizing the participant's subjective **feeling of friction or need for help** as the primary trigger to log and search. 
+- **Reframed Rules as Reference Examples**: Clarified that quantitative rules (prompt loops, stuck time, reversions) serve as concrete illustrations of these cognitive breakdowns rather than strict logging gating constraints.

@@ -24,13 +24,13 @@ Each user struggle is classified under one of the following descriptive categori
 
 <table>
   <colgroup>
-    <col style="width: 5%;">
-    <col style="width: 5%;">
-    <col style="width: 5%;">
-    <col style="width: 5%;">
-    <col style="width: 50%;">
-    <col style="width: 30%;">
-    <col style="width: 10%;">
+    <col style="width: 3%;">
+    <col style="width: 3%;">
+    <col style="width: 3%;">
+    <col style="width: 3%;">
+    <col style="width: 40%;">
+    <col style="width: 45%;">
+    <col style="width: 3%;">
   </colgroup>
   <thead>
     <tr>
@@ -49,8 +49,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>SCOPING</td>
       <td>Iris</td>
       <td>2026-07-28</td>
-      <td>The agent critiqued Iris's target user scoping as too broad. Iris struggles to define a narrow user group for the research paper validation without feeling like she is excluding members of her lab cohort. Under this critique, Iris proposed expanding the tool to support complex open-source repos, which the agent warned would cause massive scope creep.</td>
-      <td>Iris resolved the conflict by splitting the lab implementation from the research paper scope: she steered the agent to limit the paper's validation strictly to Angular/Firebase codebases, moving the open-source vision to the long-term appendix.</td>
+      <td>Iris is struggling to define a narrow target user persona for the research paper validation without excluding other members of her lab cohort. Under this critique, Iris proposed expanding the tool to support complex open-source repos, which the agent warned would cause massive scope creep.</td>
+      <td>Instead of defining a single target user for the entire program, Iris resolved this by splitting the lab curriculum from the research paper, steering the agent to limit the paper's validation scope strictly to Angular/Firebase codebases.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L97-L179">iris-product-chat.md:L97-L179</a></td>
     </tr>
     <tr>
@@ -58,8 +58,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>The agent critiqued the planned metric dashboard (tracking typing speed and planning ratios) as "administrative surveillance" that developers would resist. Alexis is stuck trying to design a learning feedback system that forces active reflection without creating compliance gaming or surveillance anxiety.</td>
-      <td>Alexis redirected the agent away from tracking speed/ratios and co-designed a learning system where reflections are triggered only when stuck, mapping group metrics to repository template health rather than individual performance.</td>
+      <td>The agent critiqued the planned metric dashboard (tracking typing speed and planning ratios) as "administrative surveillance." Alexis is struggling to design a learning feedback system that triggers reflection without making users feel monitored or creating compliance gaming.</td>
+      <td>Instead of tracking developer speed and ratio metrics, Alexis resolved the surveillance anxiety by prompting the agent to co-design CLI-triggered reflections and repository-level template failure heatmaps.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-product-chat.md#L109-L140">alexis-product-chat.md:L109-L140</a></td>
     </tr>
     <tr>
@@ -67,8 +67,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Varia</td>
       <td>2026-07-22</td>
-      <td>The agent proposed flat-summarizing all individual chats for team convergence. Varia worries that flat AI summaries will create too much text for the team to read, causing synthesis overload and leaving no cognitive space or time for actual human convergence and alignment.</td>
-      <td>Varia steered the agent to change its aggregation model: instead of generating flat summaries, the AI extracts only pinpointed themes and divergent points to trigger authentic human discussion rather than AI reading.</td>
+      <td>Varia worries that flat AI-generated summaries of individual brainstorms will cause synthesis overload and leave no cognitive space for human convergence.</td>
+      <td>Instead of generating flat summaries of individual chats, Varia resolved this by steering the agent to extract only pinpointed highlights and themes to trigger active human discussion.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/varia/varia-research-chat.md#L52-L90">varia-research-chat.md:L52-L90</a></td>
     </tr>
     <tr>
@@ -76,8 +76,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>HALLUCINATION</td>
       <td>Varia</td>
       <td>2026-08-01</td>
-      <td>During validation planning, the agent experienced context drift and hallucinated criticisms about analyzing "Slack/Discord messages," completely losing track of the product's actual architecture (individual student-to-AI transcripts).</td>
-      <td>Varia explicitly intervened and ordered the agent to halt, pointing out the hallucination directly and instructing it to re-read the core product-thesis and research-thesis files to align its suggestions.</td>
+      <td>The agent hallucinated criticisms about analyzing "Slack/Discord messages," losing track of the core product concept (individual student-to-AI transcripts).</td>
+      <td>Instead of letting the agent continue criticizing the wrong architecture, Varia resolved the drift by prompting the agent to re-read the core thesis files.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/varia/varia-validation-chat.md#L123-L140">varia-validation-chat.md:L123-L140</a></td>
     </tr>
     <tr>
@@ -85,8 +85,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>METACOGNITIVE</td>
       <td>Rachel</td>
       <td>2026-07-10</td>
-      <td>The agent pushed for shared brainstorming logs. Rachel worries about the social barrier for junior students, who are too intimidated to share half-formed research ideas in front of peers and mentors, causing them to stay silent in sync reviews.</td>
-      <td>Rachel steered the agent to define a two-stage privacy boundary: the AI acts as a private questioning partner first, and the group template only exposes support tags for ideas rather than raw transcript files.</td>
+      <td>Rachel is concerned that junior students are too intimidated to share half-formed research ideas publicly in front of peers and mentors.</td>
+      <td>Instead of forcing students to share raw conversational logs, Rachel resolved the sharing anxiety by steering the agent to act as a private questioning partner, exposing only support tags in the group template.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/rachel/rachel-product-chat.md#L90-L100">rachel-product-chat.md:L90-L100</a></td>
     </tr>
     <tr>
@@ -94,8 +94,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>METACOGNITIVE</td>
       <td>Aubrey</td>
       <td>2026-07-08</td>
-      <td>The agent assumed target users are "highly motivated/desperate" students. Aubrey points out that students actually skim onboarding guides and fail tasks because they are too intimidated to ask human mentors for help and suffer from help-seeking vocabulary gaps.</td>
-      <td>Aubrey steered the agent to pivot the user persona from a resilient expert to an "intelligent but fragile novice" who needs psychological safety, configuring the tool to provide low-stakes conversational AI partners to build confidence.</td>
+      <td>Aubrey points out that new students skim onboarding guides and fail because they are too intimidated to ask human mentors for help when confused.</td>
+      <td>Instead of designing walkthroughs for highly resilient novices, Aubrey resolved the onboarding gap by steering the agent to design a conversational interface that acts as a low-stakes learning partner.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/aubrey/aubrey-product-chat.md#L40-L68">aubrey-product-chat.md:L40-L68</a></td>
     </tr>
     <tr>
@@ -103,8 +103,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Alej</td>
       <td>2026-07-15</td>
-      <td>The agent warned that if the Socratic tool refuses to write code, students will just open ChatGPT in another tab. Alej faces a dilemma: how to create learning resistance without making the tool so annoying that students bypass it entirely.</td>
-      <td>Alej steered the design to build contextual templates and pre-written helper prompts directly into the editor interface, making it lower-friction for students to use the Socratic tool than opening an external tab.</td>
+      <td>Alej faces a dilemma: if the Socratic tool refuses to write code, students will bypass it by copying their task into ChatGPT in another tab.</td>
+      <td>Instead of using strict Socratic refusals, Alej resolved the bypassing risk by steering the agent to build context-aware templates and helper prompts directly into the interface.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alej/alej-product-chat.md#L83-L100">alej-product-chat.md:L83-L100</a></td>
     </tr>
     <tr>
@@ -112,8 +112,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Varia</td>
       <td>2026-07-22</td>
-      <td>The agent proposed sharing raw developer logs. Varia worries that busy faculty mentors will ignore raw transcript graveyards due to time constraints, defeating the tool's collaborative value.</td>
-      <td>Varia pushed back on raw transcript sharing, steering the agent to design a synthesis overview that surfaces pros/cons and themes rather than raw conversation files.</td>
+      <td>Varia worries that busy faculty mentors will ignore raw developer transcripts due to time constraints, leaving logs unread.</td>
+      <td>Instead of publishing raw developer logs, Varia resolved this by steering the agent to design a synthesis overview of pros/cons and themes rather than raw conversation files.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/varia/varia-research-chat.md#L308-L330">varia-research-chat.md:L308-L330</a></td>
     </tr>
     <tr>
@@ -121,8 +121,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>SCOPING</td>
       <td>Varia</td>
       <td>2026-07-22</td>
-      <td>Varia is struggling to find literature to validate their learnersourcing approach, worrying that reviewers will reject the contribution as unoriginal since many platforms explore collaborative coding.</td>
-      <td>Varia prompted the agent to search for positioning gaps, steering it to define "Telemetry-Driven Learnersourcing" (capturing user friction signals rather than manual user summaries).</td>
+      <td>Varia is struggling to position the learnersourcing approach in the literature, worrying it will be rejected as unoriginal.</td>
+      <td>Instead of framing it as standard learnersourcing, Varia resolved the gap by prompting the agent to position the paper around "Telemetry-Driven Learnersourcing" (capturing friction signals).</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/varia/varia-research-chat.md#L548-L570">varia-research-chat.md:L548-L570</a></td>
     </tr>
     <tr>
@@ -130,8 +130,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>THEORETICAL</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>The agent proposed "contextual runtime scaffolding" as a key concept. Alexis is stuck because he cannot understand what this looks like in practice compared to standard static tutorials.</td>
-      <td>Alexis pressed the agent for concrete definitions, steering it to outline visual layout playgrounds, database query visualizers, and pre-written diagnostic widgets in the IDE sidebar.</td>
+      <td>Alexis cannot understand what "contextual runtime scaffolding" looks like in practice compared to static tutorials.</td>
+      <td>Instead of accepting abstract terms, Alexis resolved this by prompting the agent for concrete definitions, steering it to design specific layout and query widgets.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-research-chat.md#L85-L120">alexis-research-chat.md:L85-L120</a></td>
     </tr>
     <tr>
@@ -139,8 +139,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>If the tool forces reflection prompts, developers will write low-effort gibberish just to bypass the gates, rendering the reflections useless.</td>
-      <td>Alexis co-designed an NLU gating mechanism with the agent that checks reflection relevancy and understandability before unblocking the task, preventing raw bypass entries.</td>
+      <td>Alexis is concerned that forcing reflections will lead to compliance gaming (users writing gibberish to bypass triggers).</td>
+      <td>Instead of using unchecked reflection fields, Alexis resolved this by co-designing an NLU gating mechanism that validates reflection relevance and syntax.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-research-chat.md#L140-L180">alexis-research-chat.md:L140-L180</a></td>
     </tr>
     <tr>
@@ -148,8 +148,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>THEORETICAL</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>The agent demanded that Alexis align validation hypotheses with academic theories (e.g. Double-Loop Learning), but Alexis is stuck because the theories are too abstract and hard to connect to features.</td>
-      <td>Alexis pushed the agent to visualize the theories, translating Double-Loop Learning into template-update loops where student telemetry updates the master walkthrough files.</td>
+      <td>Alexis is struggling to map abstract academic theories (e.g. Double-Loop Learning) to concrete system design features.</td>
+      <td>Instead of relying on theoretical abstracts, Alexis resolved this by prompting the agent to translate Double-Loop Learning into template-update telemetry loops.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-research-chat.md#L239-L290">alexis-research-chat.md:L239-L290</a></td>
     </tr>
     <tr>
@@ -157,8 +157,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>TECHNICAL</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Alexis identified that developers get stuck on the same prompt errors and waste hours manually asking peers or searching disorganized channels, slowing down overall cohort velocity.</td>
-      <td>Alexis steered the agent to design a centralized CLI command that automatically logs, sanitizes, and indexes steering solutions inside the workspace repository.</td>
+      <td>Alexis notes that developers waste hours manually asking peers on Slack/Discord to solve recurring prompt-steering errors.</td>
+      <td>Instead of relying on manual peer questioning, Alexis resolved the friction by steering the agent to design a CLI command that logs and indexes steering fixes.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-product-chat.md#L109-L135">alexis-product-chat.md:L109-L135</a></td>
     </tr>
     <tr>
@@ -166,8 +166,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Reading a 4-hour raw developer transcript is a turn-off for developers who are stuck and under time pressure, making raw transcripts an ineffective help resource.</td>
-      <td>Alexis directed the agent to co-design collapsible summaries and highlight pivot moments, creating a timeline summary of key decisions rather than raw logs.</td>
+      <td>Alexis is concerned that reading a long, 4-hour raw chat log is a turn-off for developers looking for quick solutions.</td>
+      <td>Instead of displaying raw logs, Alexis resolved this by steering the agent to co-design collapsible timelines and automated pivot moment highlights.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-product-chat.md#L333-L370">alexis-product-chat.md:L333-L370</a></td>
     </tr>
     <tr>
@@ -175,8 +175,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>TECHNICAL</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Alexis is worried that different teams have completely isolated error profiles, which would make a shared logs registry useless for cohort alignment.</td>
-      <td>Alexis structured MVP 1 to run a retrospective study mapping error profiles across different teams to test the recurrence assumption before coding.</td>
+      <td>Alexis is worried that different teams have completely isolated error profiles, making a shared registry of peer logs useless.</td>
+      <td>Instead of building a complex database immediately, Alexis resolved this by structuring MVP 1 as a retrospective check mapping historical error overlap.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-validation-chat.md#L27-L65">alexis-validation-chat.md:L27-L65</a></td>
     </tr>
     <tr>
@@ -184,8 +184,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Alexis is confused about whether the tool should be a VS Code extension, a CLI tool, or an agent skill, making it difficult to define the core system architecture.</td>
-      <td>Alexis pushed the agent to detail the interfaces, defining the tool as a CLI command for logging and an interactive sidebar extension for chat.</td>
+      <td>Alexis is confused about the tool's interface format (whether it operates as a CLI tool, VS Code extension, or agent skill).</td>
+      <td>Instead of choosing a single medium, Alexis resolved this by prompting the agent to split the interface into a CLI for logging and a VS Code sidebar widget for chat.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-validation-chat.md#L285-L320">alexis-validation-chat.md:L285-L320</a></td>
     </tr>
     <tr>
@@ -193,8 +193,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>If 10+ teams hit the same error, displaying all 10 logs will overwhelm developers. Alexis is stuck trying to filter the logs without losing context.</td>
-      <td>Alexis steered the agent to design similarity grouping algorithms that merge identical failures and rank logs by developer feedback ratings.</td>
+      <td>Alexis is concerned that if 10+ people hit the same error, showing all their logs will cause cognitive overload.</td>
+      <td>Instead of listing all logs sequentially, Alexis resolved this by steering the agent to design similarity grouping and user rating filters.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-validation-chat.md#L681-L720">alexis-validation-chat.md:L681-L720</a></td>
     </tr>
     <tr>
@@ -202,8 +202,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>SCOPING</td>
       <td>Iris</td>
       <td>2026-07-28</td>
-      <td>Iris wants to keep the tool inclusive for all lab members by supporting open-source repos, but the agent critiques this as a source of massive scope creep.</td>
-      <td>Iris resolved the scope tension by limiting the paper's validation scope to the lab's Angular/Firebase curriculum while deferring open-source extensions.</td>
+      <td>Iris wants to support complex open-source repos to keep the tool inclusive, but the agent critiques this as massive scope creep.</td>
+      <td>Instead of supporting arbitrary repositories, Iris resolved this by steering the agent to limit the research scope strictly to the lab's Angular/Firebase curriculum.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L97-L160">iris-product-chat.md:L97-L160</a></td>
     </tr>
     <tr>
@@ -211,8 +211,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Iris</td>
       <td>2026-07-28</td>
-      <td>The agent proposed telling the developer "I refuse to write code." Iris warns that this blunt Socratic friction is a turn-off for students under time pressure.</td>
-      <td>Iris redirected the agent to co-design diagnostic questions that frame the friction as helpful advice rather than simple refusals.</td>
+      <td>Iris warns that blunt Socratic messages (like "I refuse to write code") will frustrate students under tight time pressure.</td>
+      <td>Instead of displaying a hard refusal message, Iris resolved this by steering the agent to co-design helpful diagnostic questions.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L182-L200">iris-product-chat.md:L182-L200</a></td>
     </tr>
     <tr>
@@ -220,8 +220,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>VALIDATION</td>
       <td>Iris</td>
       <td>2026-07-28</td>
-      <td>Iris's advisor wants to test both learning retention and learnersourcing at once, diluting the focus of the validation study.</td>
-      <td>Iris split the validation metrics: tested individual learning retention inside walkthroughs and learnersourcing updates via cohort dashboards.</td>
+      <td>Iris's advisor wants to validate both individual learning and learnersourcing at once, diluting the focus of the study.</td>
+      <td>Instead of testing both in a single block, Iris resolved this by steering the agent to split the study into walkthrough retention metrics and cohort dashboards.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L194-L200">iris-product-chat.md:L194-L200</a></td>
     </tr>
     <tr>
@@ -229,8 +229,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>SCOPING</td>
       <td>Aubrey</td>
       <td>2026-07-08</td>
-      <td>The agent attempted to scope "practice mode" tasks into the product thesis, which Aubrey rejects as irrelevant to walkthrough guides.</td>
-      <td>Aubrey pushed back on the agent's inclusion, explicitly limiting the product thesis scope strictly to conversational walkthrough mode guides.</td>
+      <td>The agent attempted to scope "practice mode" into the product thesis, which Aubrey rejects as unrelated to walkthrough guides.</td>
+      <td>Instead of including practice mode in the thesis, Aubrey resolved this by pushing back and limiting the scope strictly to conversational walkthrough mode.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/aubrey/aubrey-product-chat.md#L254-L278">aubrey-product-chat.md:L254-L278</a></td>
     </tr>
     <tr>
@@ -238,8 +238,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Rachel</td>
       <td>2026-07-10</td>
-      <td>Rachel notices that loud, confident team members dominate sync meetings, silencing quiet or junior students.</td>
-      <td>Rachel directed the agent to co-design AI templates that structure individual brainstorming logs into neutral summaries highlighting all viewpoints equally.</td>
+      <td>Rachel is concerned that confident, loud students dominate sync alignment meetings, silencing quiet or junior team members.</td>
+      <td>Instead of relying on open-ended group sync debates, Rachel resolved this by steering the agent to co-design templates that summarize individual ideas into neutral summaries.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/rachel/rachel-validation-chat.md#L73-L90">rachel-validation-chat.md:L73-L90</a></td>
     </tr>
     <tr>
@@ -247,8 +247,8 @@ Each user struggle is classified under one of the following descriptive categori
       <td>DESIGN-FRICTION</td>
       <td>Rachel</td>
       <td>2026-07-10</td>
-      <td>Rachel is struggling to attribute ideas to individuals on the agenda without exposing raw chats and violating developer privacy.</td>
-      <td>Rachel steered the agent to design overview templates showing options with support tags, keeping conversational histories private.</td>
+      <td>Rachel is struggling to attribute ideas on the shared template without exposing raw transcripts and violating developer privacy.</td>
+      <td>Instead of exposing raw conversation histories, Rachel resolved this by steering the agent to display support tags for options while keeping transcripts private.</td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/rachel/rachel-product-chat.md#L325-L360">rachel-product-chat.md:L325-L360</a></td>
     </tr>
   </tbody>
