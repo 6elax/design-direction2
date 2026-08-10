@@ -86,3 +86,4 @@ Beyond these, we explore:
 ### 🔵 Strong Stances
 *   **No Live Logging Probe:** Replaced the live Google Forms/Markdown logging sprint with a retrospective survey evaluation to bypass participant compliance risk.
 *   **Socratic Context Focus:** Prioritized evaluating *Socratic contrast questions* over simple code snippets, checking if conceptual guidance helps across different lifecycles.
+*   **Domain-Agnostic Plain English & Conciseness:** Enforce that all registry case summaries are written in plain, non-wordy English. Keep descriptions to 1-2 punchy sentences, avoiding platform-specific jargon (e.g. framework names, specific database APIs, custom package configurations). Refer to authors directly by their actual names (e.g., Iris, Alexis) rather than role descriptors (e.g., "the designer", "the developer"), leveraging the metadata team column for cohort background context.

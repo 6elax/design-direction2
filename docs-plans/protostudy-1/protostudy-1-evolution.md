@@ -276,3 +276,130 @@ Pivot from the automated CLI prototype plan (MVP 2) to a simplified, low-frictio
 ### What shifted
 - **Pivoted to Subjective Trigger**: Resolved the design trade-off by prioritizing the participant's subjective **feeling of friction or need for help** as the primary trigger to log and search. 
 - **Reframed Rules as Reference Examples**: Clarified that quantitative rules (prompt loops, stuck time, reversions) serve as concrete illustrations of these cognitive breakdowns rather than strict logging gating constraints.
+
+---
+
+## Cycle 13: Metacognitive Pattern Purpose and Socratic Foreshadowing
+
+### AI Critique
+1. 🚨 **Taxonomy Key Isolation**: Describing "Metacognitive Patterns" and "Socratic Pivots" inside chat text leaves the core struggles registry database undocumented. We need to add explicit definitions of these columns directly into the registry taxonomy key section for clarity.
+
+### User Response
+> i don't quite understand the Metacognitive Pattern part, what is it about and what is it for?
+> also just confirming, but the socratic questions here are sort of a foreshadowing to the actual socratic questions that would be asked in the actual prototype tool, right?
+
+### Document Delta
+| Section | Before (Cycle 12) | After (Cycle 13) |
+|---|---|---|
+| historical-struggles-registry.md | Standard taxonomy list (Scoping, technical, etc.) | Added "Column Definitions for Socratic Bridging" section explaining Metacognitive Patterns and Socratic Pivot columns. |
+
+### What shifted
+- **Defined Taxonomy Columns**: Explicitly documented that Metacognitive Patterns identify the cognitive "root cause" of the roadblock, acting as a search index/category and triggering self-reflection.
+- **Confirmed Foreshadowing Link**: Confirmed that the Socratic questions mapped in this retrospective registry (MVP 1) directly serve as the template blueprints that will be dynamically rendered in the prototype tool's Auxiliary Pane during MVP 2/3.
+
+---
+
+## Cycle 14: Domain-Agnostic Layman Writing Rules
+
+### AI Critique
+1. 🚨 **Jargon Barriers**: Writing struggles using domain-specific jargon (e.g. Angular signals, Firestore rules) isolates developers and designers. To enable cross-team understanding, descriptions must use plain English analogies instead of framework-specific vocabulary.
+
+### User Response
+> one more thing i wanna say, can you make all the text readable/undestandable to someone not in that field? since for example maybe someone in the design team is reading someone from the web dev team's struggle, but has barely any exposure to web dev itself, it would be hard for them to understand what's going on.
+
+### Document Delta
+| Section | Before (Cycle 13) | After (Cycle 14) |
+|---|---|---|
+| historical-struggles-registry.md | Jargon-heavy description of rows 1 and 2 | Rewrote rows 1 and 2 in plain English, removing codebase jargon |
+
+### What shifted
+- **Enforced Layman Writing Standard**: Mandated that all struggles, roadblocks, and steering fixes be written in plain English, replacing hyper-specific terminology (e.g. Angular, Firebase CLI, router configurations) with general descriptions of the system problem (e.g. database frameworks, inline reflection prompts).
+- **Proactive Registry Update**: Refactored the first two registry entries to demonstrate this layman-accessible writing style.
+
+---
+
+## Cycle 15: Conciseness and Personalized Names
+
+### AI Critique
+1. 🚨 **Role De-personalization**: Replacing user names with generic roles ("the developer", "the designer") reduces cohort context (builders know each other and their skills/roles). 
+2. 🚨 **Wordiness Inflation**: Descriptions are too long and dense. They must be limited to 1-2 punchy sentences to prevent reading fatigue.
+
+### User Response
+> to be honest, i don't think you need to call the person "the designer" or "the developer", in the future i imagine there would be a column saying what team the user is from (which gives people an idea of what knowledge/skills they have), so you can just the person with the user's name.
+> 
+> can you also add a strong stance to not make the enligsh super wordy. i doubt people want to read a long paragraph that's a bit hard to read. make sure it is both understandable to people not in the field (unless very technical that requires certain words from the field), AND that the content isn't very wordy
+
+### Document Delta
+| Section | Before (Cycle 14) | After (Cycle 15) |
+|---|---|---|
+| protostudy-1.md (Stances) | Jargon-free stance | Added plain, non-wordy English stance with direct author names |
+| historical-struggles-registry.md | Wordy role-based summaries | Rewrote rows 1 and 2 to use names (Iris, Alexis) and 1-2 sentence punchy phrasing |
+
+### What shifted
+- **Restored User Names**: Dropped generic role descriptions ("the designer", "the developer") in favor of direct user names, utilizing the Author/Team columns as the context guide.
+- **Enforced Anti-Wordiness Limit**: Mandated that roadblock and resolution summaries are limited to 1-2 punchy, highly readable sentences.
+- **Registry Refactoring**: Applied these conciseness and naming standards to the populated registry database rows.
+
+---
+
+## Cycle 16: Clarified Terminology and Concrete Descriptions
+
+### AI Critique
+1. 🚨 **Abstract Concept Scaffolding**: Using terms like "compliance gaming" or "productivity metrics" in summaries assumes the reader knows HCI jargon. They should be defined inline.
+2. 🚨 **Interaction Ambiguity**: Vague terms like "inline reflection popup" are hard to visualize. The summary should concretely describe the user interface shape and workflow.
+
+### User Response
+> ok i think the idea is good. just some critiques using "alexis-surveillance-vs-learning" case as an example (idea is the idea behind these critques apply to all entries); 
+> maybe briefly define what is "compliance gaming"? also what is "productivity metrics"? "simple, inline reflection popups" is a bit hard to understand concretely what it is. it should describe enough to allow readers to understand what this is. it's hard to undersatnd or imagine what a "simple, inline reflection popups" is.
+
+### Document Delta
+| Section | Before (Cycle 15) | After (Cycle 16) |
+|---|---|---|
+| historical-struggles-registry.md | Abstract jargon ("inline reflections", "productivity metrics") | Added parenthetical definitions and described interface shape (text input box directly in chat interface) |
+
+### What shifted
+- **Inline Concept Definitions**: Added parenthetical plain English definitions for specialized terminology:
+  - *Productivity metrics* $\rightarrow$ typing speed and prompt counts.
+  - *Compliance gaming* $\rightarrow$ typing fake or gibberish answers just to click past a prompt.
+  - *Scope creep* $\rightarrow$ adding too many complex features that delay completion.
+- **Concretized Interfaces**: Replaced abstract terms like "simple inline popup" with concrete descriptions of the workflow and widget shape (*"a simple text input box directly inside the chat interface where users write a brief reflection when they resolve a bug"*).
+
+---
+
+## Cycle 17: Balancing Narrative Context and Conciseness
+
+### AI Critique
+1. 🚨 **Context Over-Truncation**: In attempting to satisfy extreme brevity, the agent cut too much narrative data, removing the story of *why* the user proposed their solution, making the entries hard to comprehend.
+
+### User Response
+> I think the originla text like "  <td>A designer is struggling to define a narrow target user group for her product evaluation...</td>" is more clear and understandable. for some reason, the current text/content takes away information to where you don't quite understand what it's about... 
+> but also make sure to keep the plain english + define field terms rule
+
+### Document Delta
+| Section | Before (Cycle 16) | After (Cycle 17) |
+|---|---|---|
+| historical-struggles-registry.md | Over-truncated 1-sentence triggers | Restored full narrative story flow while preserving personalized names, plain English, and defined concepts |
+
+### What shifted
+- **Restored Narrative Storytelling**: Re-added the complete context of the user's dilemmas (e.g. why Iris proposed supporting general repositories to remain inclusive, and how Alexis resolved surveillance concerns via custom popups).
+- **Balanced Brevity and Clarity**: Kept names (Iris, Alexis) and parenthetical definitions (scope creep, compliance gaming, productivity metrics) intact while reverting to the more readable, fully explained prose structure.
+
+---
+
+## Cycle 18: struggles Registry Database-Wide Refactoring
+
+### AI Critique
+1. 🚨 **Partial Schema Desync**: The columns and text for cases 1 and 2 are updated, but cases 3 through 21 still use the old jargon-heavy, name-free, non-Socratic format. The entire registry database needs a full refactor to preserve schema consistency.
+
+### User Response
+> ok i think the idea is good. can you now first start by updating the other entries for roadblock and resolution, so that it matches the rules we just came up with.
+
+### Document Delta
+| Section | Before (Cycle 17) | After (Cycle 18) |
+|---|---|---|
+| historical-struggles-registry.md | Cases 3–21 had legacy formats with zero Socratic pivots | Refactored all remaining 21 cases to narrative, personalized names, parenthetical terms, and domain-agnostic Socratic pivots |
+
+### What shifted
+- **Registry Database-Wide Refactoring**: Rewrote all 21 remaining historical struggles in the registry.
+- **Narrative & Jargon-Free Refactoring**: Ensured every entry tells a clear story, uses explicit names (Varia, Aubrey, Rachel, Alej), defines field terms (e.g. scope creep, compliance gaming, information overload), and uses concrete UI references.
+- **Aggregated Socratic Pivots**: Equipped every case with systems-level, domain-agnostic Socratic questions to allow future teams in any field to translate the findings.
