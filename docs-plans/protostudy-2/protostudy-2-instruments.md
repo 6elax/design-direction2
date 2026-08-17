@@ -1,4 +1,4 @@
-# Protostudy 2 Instruments — MVP 2: Streamlined Local CLI
+# Protostudy 2 Instruments — MVP 2: Streamlined Chat Companion
 
 This companion document holds the operational detail for data collection for MVP 2. It contains the exact question guides, links, protocols, and observation lenses used to validate steering breakdowns and Socratic peer highlights.
 
@@ -20,7 +20,7 @@ This companion document holds the operational detail for data collection for MVP
 
 ### 2. During-Use Survey (Trigger-Gated Reflections)
 * **Form URL**: [https://forms.gle/3F4GkdkBAgjuzuoFA](https://forms.gle/3F4GkdkBAgjuzuoFA)
-* **Timing**: Users fill this out whenever a struggle is resolved and logged by the SkillWeave CLI.
+* **Timing**: Users fill this out whenever a struggle is resolved and logged by the SkillWeave in-chat companion.
 * **Reflective & Assessment Lenses**:
   - **Logged vs. Provided Help**:
     1. *Did the peer match preview summary capture your actual struggle accurately?* (1 = Not at all, 5 = Perfectly).
@@ -68,7 +68,7 @@ Open-ended questions for 15-minute debrief conversations.
 |---|---|---|
 | **Raw Log Expansion Rate** | When Level 2 Socratic Workspace Pane is opened | **H5**: Do users value LLM timeline highlights, or do they still expand the raw 4-hour logs? |
 | **Voluntary Reflection Rate** | During the SkillWeave log loop | **H4**: Do builders willingly write reflections, or does the "soft log" option lead to complete bypass? |
-| **Struggle Intercept Rate** | telemetery CLI logs | **H2**: How accurately do keyboard idle times and file reversions flag conceptual breakdowns? |
+| **Struggle Intercept Rate** | in-chat companion telemetry logs | **H2**: How accurately do keyboard idle times and file reversions flag conceptual breakdowns? |
 
 ---
 

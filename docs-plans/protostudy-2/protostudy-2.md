@@ -1,4 +1,4 @@
-# Protostudy 2 — MVP 2: Streamlined Local CLI
+# Protostudy 2 — MVP 2: Streamlined Chat Companion
 
 **Companion docs:** [protostudy-2-instruments.md](./docs-plans/protostudy-2/protostudy-2-instruments.md) (surveys, interview guides, observation protocols, TMS lenses)
 
@@ -8,7 +8,7 @@
 
 **Launch**: August 15, 2026 | **Reflection**: August 29, 2026
 
-Before we can build an integrated, automated double-loop learning loop for the whole lab cohort, we need to test whether builders will adopt a constrained, Socratic diagnostic helper and if LLM timeline highlights preserve the necessary contextual details. We're building a local telemetry checker daemon, an Artifact-based suggestion card generator, and a cloud Supabase logging pipeline. We are collecting data through telemetry logs, a 3-part Google Forms survey sequence, and exit interviews to evaluate both scaffolding adoption and timeline usability.
+Before we can build an integrated, automated double-loop learning loop for the whole lab cohort, we need to test whether builders will adopt a constrained, Socratic diagnostic helper and if LLM timeline highlights preserve the necessary contextual details. We're building an in-chat companion integration, an Artifact-based suggestion card generator, and a cloud Supabase logging pipeline. We are collecting data through telemetry logs, a 3-part Google Forms survey sequence, and exit interviews to evaluate both scaffolding adoption and timeline usability.
 
 ### What We're Testing & Exploring
 
@@ -22,14 +22,15 @@ Beyond testing assumptions, we're exploring the community-wide learning experien
 * **Soft Log Friction** — How does removing strict validation (allowing optional reflections) impact the quantity and quality of logs committed to the shared database?
 
 ### What We're Building
-A lightweight local CLI prototype that watches active conversations and presents peer Socratic case studies in the Electron artifacts pane.
-* **Telemetry Checker Daemon** — A background shell loop that matches typing speed and reversions, calling `skill-weave-agent --mode check` when a struggle pattern is detected.
-* **Artifact-Based Suggestion Card (Level 1)** — A script that outputs a markdown file (`peer_suggestion_card.md`) to the user's system artifacts directory, automatically loading a visual suggestion card inside Antigravity 2.0's HTML Auxiliary pane.
-* **Socratic Workspace Pane (Level 2)** — A local markdown file detailing peer reflections, code diffs, and contrast questions that opens in the right-side Artifacts panel when clicked.
+A lightweight in-chat companion prototype that watches active conversations and presents peer Socratic case studies in the right-side Artifacts panel.
+* **In-Chat Checking Harness** — A script (`skill-weave-agent.ts`) invoked by chat hooks at the end of each turn that runs checking against the remote Supabase database when a struggle is detected by the reflections agent.
+* **Telemetry Logger** — Logs typing speed, idle time, and error/friction frequencies to map breakdown signals.
+* **Artifact-Based Suggestion Card (Level 1)** — A script that outputs a markdown file (`peer_suggestion_card.md`) to the user's active conversation directory, automatically rendering a visual suggestion card inside the right-side Artifacts panel.
+* **Socratic Workspace Pane (Level 2)** — A local markdown file (`peer-workspace-pane.md`) detailing peer reflections, code diffs, and contrast questions that opens in the right-side Artifacts panel when clicked.
 * **Soft Logging Database Pipeline** — A central cloud Supabase database logging tool that supports optional/null Socratic reflection inputs.
 
 ### How We're Collecting Data
-We will deploy the CLI tool to 10 student builders in our research lab for two weeks.
+We will deploy the in-chat companion tool to 10 student builders in our research lab for two weeks.
 * **Telemetry logs** — We log typing speed, idle time, reversions, match card triggers, card dismissals, and timeline expansions.
 * **Pre/During/Post Surveys** — Administered via Google Forms to track baseline behaviors, inline match helpfulness, and perceived usability.
 * **Exit Interviews** — 15-minute post-study debriefs to unpack cognitive friction and learning behaviors.
@@ -38,21 +39,21 @@ We will deploy the CLI tool to 10 student builders in our research lab for two w
 
 ## Build Plan
 
-This round tests the Socratic intervention flow under a low-code infrastructure, leveraging the conversation system's artifacts folder to bypass Electron app recompilation.
+This round tests the Socratic intervention flow under a low-code infrastructure, leveraging the conversation system's artifacts folder to bypass application recompilation.
 
-### Feature 1: Telemetry Checker Daemon
-A background monitoring script that runs in the student's project terminal to detect struggles.
-- **Idle & Reversion Watcher** — Tracks keyboard activity and file reversions, triggering a match check when a developer is idle for >3 minutes after a reversion.
-- **Cloud Database Query Engine** — Runs a keyword similarity check directly against the remote Supabase database learnings table when a trigger fires.
+### Feature 1: In-Chat Checking Harness & Telemetry Logger
+Lightweight background checking triggered by the agent execution environment.
+- **In-Chat Hook Checker** — A script (`skill-weave-agent.ts`) invoked by chat hooks at the end of each turn that runs checking (`--mode check`) and logging (`--mode log`) against the remote Supabase database.
+- **Telemetry Logger** — Logs typing speed, idle time, and error/friction frequencies to map breakdown signals.
 
 ### Feature 2: Artifact-Based Suggestion Card (Level 1)
 Generates the visual suggestion card inside the app webview.
-- **System Artifact Writer** — Outputs `peer_suggestion_card.md` to the user's system directory, prompting Antigravity 2.0 to load it in the right-side panel.
+- **System Artifact Writer** — Outputs `peer_suggestion_card.md` to the active conversation directory, prompting Antigravity 2.0 to load it in the right-side panel.
 - **Socratic Match Card** — Displays match scores, peer names, and Socratic pivot hints.
 
 ### Feature 3: Socratic Workspace Pane (Level 2)
 The detailed comparative view.
-- **Local Markdown Generator** — Outputs `peer-workspace-pane.md` in the workspace docs folder containing the comparative diff and contrast questions.
+- **Local Markdown Generator** — Outputs `peer-workspace-pane.md` in the docs folder containing the comparative diff and contrast questions.
 
 ### Explicitly Deferred
 - **NLU Quality Gating** (Deferred to MVP 3)

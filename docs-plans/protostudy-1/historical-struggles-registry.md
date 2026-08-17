@@ -71,13 +71,13 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>DESIGN-FRICTION</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Alexis struggled to design a learning feedback system. The agent suggested tracking productivity metrics (typing speed and prompt counts) in a dashboard, which Alexis feared would feel like invasive monitoring and lead to compliance gaming (users typing fake or gibberish answers just to click past a prompt).</td>
-      <td>Instead of tracking productivity metrics, Alexis resolved the surveillance anxiety by prompting the agent to co-design a simple text input box directly inside the chat interface where users write a brief reflection when they resolve a bug, alongside a shared dashboard showing common errors.</td>
+      <td>Alexis wanted to pivot away from a commercial product into a process system, and wanted to ensure that the agent does not spoon-feed answers to the user, allowing builders to learn and think for themselves.</td>
+      <td>Alexis resolved this by steering the agent to design an "Active Reflection Trigger" (forcing post-task reflections before log submission) and a "Metacognitive Helper Agent" that acts as a diagnostic guide pointing to peer transcripts instead of writing code.</td>
       <td>
-        <b>Metacognitive Pattern:</b> Surveillance vs. Growth (measuring compliance metrics causes evaluation anxiety, prompting users to game the system).<br><br>
+        <b>Metacognitive Pattern:</b> Active Learning Pivot (moving from simple tool automation to systems that force active reflection and diagnostic thinking).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
-        1. Does your design require collecting user performance data (like typing speed), or is a simple description of their final solution sufficient?<br>
-        2. How can you structure feedback inputs directly into the workflow so users perceive them as a helpful pause rather than a chore they want to skip?
+        1. Does your agent design spoon-feed answers to users? How can you introduce checkpoints or prompts that force active problem-solving?<br>
+        2. What diagnostic guides or peer reference logs can you expose to help users learn from context rather than receiving direct code fixes?
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-product-chat.md#L109-L140">alexis-product-chat.md:L109-L140</a></td>
     </tr>
@@ -116,31 +116,17 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>METACOGNITIVE</td>
       <td>Rachel</td>
       <td>2026-07-10</td>
-      <td>Rachel was concerned that junior students would feel too intimidated to share half-formed research ideas publicly in front of peers and faculty mentors.</td>
-      <td>Instead of forcing students to publish raw chat logs, Rachel resolved the sharing anxiety by steering the agent to act as a private questioning partner, exposing only general support tags in the shared template.</td>
+      <td>Rachel was concerned that junior team members would feel too intimidated to share half-formed, undeveloped research ideas publicly in front of peers and faculty mentors.</td>
+      <td>Rachel resolved this by using the AI agent as a private questioning partner that helps individuals stress-test their ideas privately, allowing them to bring thoroughly developed proposals to team syncs.</td>
       <td>
-        <b>Metacognitive Pattern:</b> Evaluation Anxiety (intimidating users into withholding ideas due to public exposure).<br><br>
+        <b>Metacognitive Pattern:</b> Evaluation Anxiety (withholding ideas early due to fear of public perception).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
-        1. Does your design force users to share raw, unedited work? How can you build private draft spaces to encourage low-stakes experimentation?<br>
-        2. What is the minimum metadata users can share to collaborate without exposing their entire thought process?
+        1. Does your collaboration system require sharing early-stage drafts publicly? How can you utilize private AI sparring to build user confidence before sharing?<br>
+        2. What is the minimum necessary structure to help users stress-test their ideas individually before a team sync?
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/rachel/rachel-product-chat.md#L90-L100">rachel-product-chat.md:L90-L100</a></td>
     </tr>
-    <tr>
-      <td><code>aubrey-fragile-novice-onboarding</code></td>
-      <td>METACOGNITIVE</td>
-      <td>Aubrey</td>
-      <td>2026-07-08</td>
-      <td>Aubrey pointed out that new students often skim written onboarding instructions and fail because they are too intimidated to ask human mentors for help when confused.</td>
-      <td>Instead of expecting novices to follow static guides, Aubrey resolved the learning gap by steering the agent to design an interactive conversational partner that guides the user through tasks step-by-step.</td>
-      <td>
-        <b>Metacognitive Pattern:</b> Novice Helplessness (skimming documentation and refusing to seek help due to intimidation).<br><br>
-        <b>💡 Socratic Pivot Questions:</b><br>
-        1. Does your onboarding rely on static text walls? How can you break instructions into active, step-by-step interactions?<br>
-        2. How can your system detect when a user is struggling in silence and offer low-stakes guidance?
-      </td>
-      <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/aubrey/aubrey-product-chat.md#L40-L68">aubrey-product-chat.md:L40-L68</a></td>
-    </tr>
+
     <tr>
       <td><code>alej-bypassing-and-resistance</code></td>
       <td>DESIGN-FRICTION</td>
@@ -176,13 +162,13 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>SCOPING</td>
       <td>Varia</td>
       <td>2026-07-22</td>
-      <td>Varia struggled to position her research approach in the literature, worrying that reviewers would reject her design as too similar to existing study tools.</td>
-      <td>Instead of framing the project as a standard study tool, Varia prompted the agent to position the paper around a new theoretical lens: capturing user friction signals automatically to generate cohort-wide templates.</td>
+      <td>Varia struggled to find unique research positioning in the literature, believing that similar study tools for student chat summaries must already exist in CSCW and CHI.</td>
+      <td>Varia reframed and differentiated her paper around the unique challenges of interdisciplinary student collaboration (spanning designers, computer scientists, and psychologists) where AI synthesis risks flattening distinct disciplinary values.</td>
       <td>
         <b>Metacognitive Pattern:</b> Weak Theoretical Framing (failing to distinguish a project from existing work in the field).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
-        1. Is your project framed as a generic tool? What unique theoretical lens or data capture mechanism distinguishes it from existing solutions?<br>
-        2. How can you position your evaluation study to highlight this core differentiation?
+        1. Is your project framed as a generic tool? What unique organizational or interdisciplinary user context distinguishes it from standard homogenous studies?<br>
+        2. How can you leverage the diverse makeup of your cohort to study unique collaboration patterns?
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/varia/varia-research-chat.md#L548-L570">varia-research-chat.md:L548-L570</a></td>
     </tr>
@@ -191,13 +177,13 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>THEORETICAL</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Alexis struggled to visualize what "contextual runtime scaffolding" (interactive guide popups) looked like in practice compared to basic static text tutorials.</td>
-      <td>Instead of accepting abstract terms, Alexis forced the agent to define concrete layouts, steering it to design specific layout components and query widgets.</td>
+      <td>Alexis struggled to understand the effectiveness of the proposed open tensions for Thread 2, and what "static tutoring" vs. "contextual runtime scaffolding" looks like in practice.</td>
+      <td>Alexis resolved this by prompting the agent to define contextual scaffolding through runtime interaction telemetry signals (predicting user breakdowns) and dynamic personalization/fading thresholds.</td>
       <td>
-        <b>Metacognitive Pattern:</b> Abstract Design Vagueness (relying on buzzwords instead of concrete layouts).<br><br>
+        <b>Metacognitive Pattern:</b> Abstract Design Vagueness (relying on high-level educational theories without defining execution details).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
-        1. Are you using abstract terms in your plan? How can you force your agent to define the exact layout, triggers, and state variables?<br>
-        2. What concrete interface widgets can represent your abstract concepts?
+        1. Are you using abstract terms in your project? What interaction telemetry signals (idle time, file reversions) will trigger your features in practice?<br>
+        2. How will your scaffolding system fade or adapt its behavior over time to fit different user experience levels?
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-research-chat.md#L85-L120">alexis-research-chat.md:L85-L120</a></td>
     </tr>
@@ -266,13 +252,13 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>TECHNICAL</td>
       <td>Alexis</td>
       <td>2026-07-20</td>
-      <td>Alexis worried that different teams have completely isolated codebases and tasks, making a shared registry of peer struggles useless because their problems would never overlap.</td>
-      <td>Instead of building a complex database immediately, Alexis structured the first study as a retrospective evaluation to audit historical chat logs for actual overlapping patterns.</td>
+      <td>Alexis worried that different teams have completely isolated project focuses and codebases, making a shared database of struggles useless because their error patterns would never overlap.</td>
+      <td>Alexis resolved this by framing this overlap assumption as the first open research question (H1: Error Overlap Context) to be tested in MVP 1, using a low-friction approach to check overlap before building a database.</td>
       <td>
         <b>Metacognitive Pattern:</b> Premature Automation (building complex sync engines before verifying that user needs actually overlap).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
-        1. Are you building complex software systems based on unverified assumptions? How can you design a manual or retrospective study to validate the need first?<br>
-        2. What manual checks can establish a baseline for your software's value?
+        1. Are you building complex software engines based on unverified assumptions about user overlap? How can you frame the assumption as an open research question to test first?<br>
+        2. What is the simplest baseline evaluation you can run to verify that your users actually encounter similar problems?
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/alexis/alexis-validation-chat.md#L27-L65">alexis-validation-chat.md:L27-L65</a></td>
     </tr>
@@ -326,15 +312,15 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>DESIGN-FRICTION</td>
       <td>Iris</td>
       <td>2026-07-28</td>
-      <td>Iris warned that blunt Socratic messages from the agent (like refusing to write code) would frustrate developers under tight deadlines and cause them to abandon the tool.</td>
-      <td>Instead of displaying hard refusal messages, Iris guided the agent to co-design diagnostic questions that help the user write their own code.</td>
+      <td>Iris warned that "harping on refuses to write code" would be a turnoff for student developers, as it sounds too rigid and annoying.</td>
+      <td>Iris resolved this by steering the agent to reframe the Socratic elements more attractively, focusing on how the tool guides active learning rather than just stating what it "refuses" to do.</td>
       <td>
         <b>Metacognitive Pattern:</b> Scaffolding Frustration (refusals in the name of learning blocking user productivity).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
         1. Does your educational tool block user progress when they get stuck? How can you transition from strict refusals to helpful hints?<br>
         2. What diagnostic prompts can guide the user toward the solution without writing it for them?
       </td>
-      <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L182-L200">iris-product-chat.md:L182-L200</a></td>
+      <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L257-L270">iris-product-chat.md:L257-L270</a></td>
     </tr>
     <tr>
       <td><code>iris-hypothesis-dilution</code></td>
@@ -349,7 +335,7 @@ In the struggles registry table below, two columns are used to make cases genera
         1. Are you trying to prove multiple research claims in one evaluation? What is the single most critical hypothesis you must isolate and test first?<br>
         2. What proxy metrics or control groups can validate that specific hypothesis?
       </td>
-      <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L194-L200">iris-product-chat.md:L194-L200</a></td>
+      <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/iris/iris-product-chat.md#L271-L280">iris-product-chat.md:L271-L280</a></td>
     </tr>
     <tr>
       <td><code>aubrey-scaffolding-scoping</code></td>
@@ -387,12 +373,12 @@ In the struggles registry table below, two columns are used to make cases genera
       <td>Rachel</td>
       <td>2026-07-10</td>
       <td>Rachel struggled to attribute ideas on a shared team template without exposing raw conversation histories, which would violate student privacy.</td>
-      <td>Instead of exposing raw logs, Rachel guided the agent to display general support tags (tracking overall options selected) while keeping individual transcripts private.</td>
+      <td>Rachel resolved this by steering the agent to design a dashboard that displays name attributions and final reasoning summaries for individual ideas, while keeping the raw sparring transcripts private.</td>
       <td>
         <b>Metacognitive Pattern:</b> Privacy-Collaboration Mismatch (disclosing raw personal logs to enable group coordination).<br><br>
         <b>💡 Socratic Pivot Questions:</b><br>
-        1. Does your collaborative dashboard require exposing private user text logs? How can you aggregate or abstract the data to preserve privacy?<br>
-        2. What is the minimum necessary coordinate signal you need to display?
+        1. Does your collaboration system require exposing raw user histories? How can you separate the private thought process from the public credit on the dashboard?<br>
+        2. What is the minimum necessary attribution signal you need to display to preserve psychological safety while still giving credit?
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/rachel/rachel-product-chat.md#L325-L360">rachel-product-chat.md:L325-L360</a></td>
     </tr>

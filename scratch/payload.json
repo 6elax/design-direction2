@@ -1,0 +1,11 @@
+{
+  "skill": "feature-architect-plan",
+  "section": "Database Entities",
+  "type": "FRUSTRATION",
+  "key": "non-destructive-schema-migration",
+  "source": "USER",
+  "model": "gemini-3.5-flash",
+  "example": "Instead of instructing the user to run 'drop table public.learnings;' followed by 'create table ...' in a new snippet to add the 'source' column, the agent should have proposed 'alter table public.learnings add column source text not null default '\''USER'\'';' within their existing schema query snippet.",
+  "insight": "Propose non-destructive schema migrations (like 'ALTER TABLE') instead of destructive recreation ('DROP TABLE') when resolving database mismatches during prototyping. Actionable insight: Add a new guideline to the entities.md resource file of feature-architect-plan to check schema alterations and recommend non-destructive ALTER TABLE commands and snippet reuse instead of destructive table drop/re-creation.",
+  "conversation-id": "b6455287-31ec-4c0e-9322-686eef8276fa"
+}
