@@ -126,7 +126,6 @@ In the struggles registry table below, two columns are used to make cases genera
       </td>
       <td><a href="file:///Users/alexisluo/tech4good/design-dir-2/examples/chatlogs/rachel/rachel-product-chat.md#L90-L100">rachel-product-chat.md:L90-L100</a></td>
     </tr>
-
     <tr>
       <td><code>alej-bypassing-and-resistance</code></td>
       <td>DESIGN-FRICTION</td>
