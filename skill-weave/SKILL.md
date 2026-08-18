@@ -64,25 +64,29 @@ SkillWeave captures telemetry passively in the background of the human-agent con
 
 ---
 
-## 🔒 Verification & Privacy Gates
+## 🔒 Verification, Synthesis & Review Gates
 
-Before any session is committed to the community database, it must pass three automated background gates:
+Before any session is committed to the community database, it must pass through automated analysis and manual review gates:
 
 ```mermaid
 graph TD
-    A[Struggle Detected] --> B[Popup Prompt: 'Did that resolve the issue?']
-    B -->|Yes| C[Verify Resolution via Chat Context]
-    B -->|No| A
-    C -->|Success| D[Run Regex Credential Sanitizer]
-    C -->|Failure| A
-    D -->|Sanitized| E[Prompt Post-Session Reflection]
-    E --> F[Commit to Cloud Database]
+    A[Struggle Detected] --> B[Struggle Resolved]
+    B --> C[Run NLU Synthesis: Extract Roadblock, Resolution, Pattern, & Questions]
+    C --> D[Run Regex Credential Sanitizer]
+    D --> E[Generate pending_struggle_log.md Review Artifact]
+    E --> F{Developer edits & approves?}
+    F -->|Approved / Proceed| G[Commit payload to Supabase Cloud DB]
+    F -->|Discard| H[Cancel Log]
 ```
 
-1.  **Micro-Toast Gate:** When the system detects a resolved struggle (indicated by user statement or positive code compile shared in chat), a popup appears above the chat input:
-    `💡 Did that last step resolve the issue? [Yes: Save Log] [No: Keep Working]`
-2.  **Validation Check:** Confirms task completion by verifying that updated code structures or test outputs shared in the chat log pass validation rules.
-3.  **Credential Sanitizer:** Runs regex parsers over code diffs and chat logs to scrub API tokens, secrets, private URLs, and personal details before saving.
+1. **Resolution Detection:** The logging pipeline remains inactive while the user is actively debugging. It triggers only when the struggle is resolved (either detected via test success/compilation in the chat, or explicitly declared by the user saying "Resolved").
+2. **NLU Synthesis & Sanitization:** The agent analyzes the dialogue history and code diffs to automatically compile the struggle metadata:
+   - **Roadblock (Insight):** The core conceptual or technical problem.
+   - **Resolution (Example):** How the developer bypassed or solved the breakdown.
+   - **Metacognitive Pattern:** The generalizable anti-pattern or pattern classification.
+   - **Socratic Pivot Questions:** 2-3 contrast questions for future readers.
+   It also runs regex filters to scrub credentials, private URLs, or keys.
+3. **Interactive Review Gating:** The synthesized metadata is written into a `pending_struggle_log.md` workspace file inside the conversation directory. Antigravity renders a custom confirmation card with a "Proceed" button. The developer opens the file, validates the auto-extracted contents, makes any desired changes directly in the text editor, and clicks **Proceed** to finalize the save.
 
 ---
 
@@ -93,7 +97,7 @@ SkillWeave triggers directly at the end of a conversational turn, integrating wi
 1.  **Reflections Agent Audit:** The reflections skill agent runs at the end of the turn and outputs a structured reflection (identifying the struggle text and checking if it is an `ERROR-CODE` or `FRUSTRATION`).
 2.  **SkillWeave Activation:** If the reflections agent logs an `ERROR-CODE` or `FRUSTRATION`, it invokes the SkillWeave script in `check` mode, passing the struggle type and text directly:
     ```bash
-    npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
+    npx tsx skill-weave/scripts/skill-weave-agent.ts \
       --mode check \
       --type "[ERROR-CODE / FRUSTRATION]" \
       --struggle "[STRUGGLE_TEXT]" \
@@ -109,10 +113,10 @@ SkillWeave triggers directly at the end of a conversational turn, integrating wi
 When a developer indicates task completion (passing the NLU verification gate), prompt them with post-task reflections and log the entry directly to the central Supabase cloud database:
 
 ```bash
-npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
+npx tsx skill-weave/scripts/skill-weave-agent.ts \
   --mode log \
   --workspace-root "<WORKSPACE_ROOT>" \
-  --payload '{"type":"TYPE","key":"KEY","insight":"INSIGHT","example":"EXAMPLE","conversation-id":"CONVERSATION_ID"}'
+  --payload '{"type":"TYPE","key":"KEY","insight":"INSIGHT","example":"EXAMPLE","conversation-id":"CONVERSATION_ID","author":"AUTHOR"}'
 ```
 
 *   **type:** Either `ERROR-CODE` or `FRUSTRATION`.
@@ -120,3 +124,4 @@ npx tsx .t4g/skills/skill-weave/scripts/skill-weave-agent.ts \
 *   **insight:** Description of the struggle (from post-task reflection questions).
 *   **example:** The solution that got them unstuck.
 *   **conversation-id:** Current conversation UUID.
+*   **author:** The author who logged the struggle.
