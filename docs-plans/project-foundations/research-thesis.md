@@ -25,7 +25,7 @@
 
 ### 1. Reflection-in-Action and Reflection-on-Action (Donald Schön) — *For the Active Reflection Trigger*
 - **Why this theory, specifically:** Schön distinguishes between *reflection-in-action* (critical thinking that occurs during the task to adjust behavior) and *reflection-on-action* (analyzing the process after completion to build mental models). SkillWeave operationalizes these in two interface areas:
-  - *Reflection-on-Action (CLI Post-Task Trigger & NLU Gate):* The CLI blocks log upload until the builder reflects. The NLU gate evaluates the response to ensure it describes a moment of *surprise* (unexpected agent behavior) and *reframing* (how the user steered the agent back), rejecting low-effort/gibberish text.
+  - *Reflection-on-Action (In-Situ Popup Trigger & Constrained Verification):* Once a struggle block is resolved, an in-situ popup query (*"Are you still stuck, or resolved?"*) immediately captures a 1-sentence builder reflection to prevent post-hoc recall bias. User edits are constrained to minimal corrections (privacy scrubbing and typos) to protect the summary's Socratic integrity, while the NLU gate grades entry relevance to prevent low-effort entries.
   - *Reflection-in-Action (Helper Agent Interaction):* When the user hits an error, they engage in diagnostic syncs with the helper agent, reflecting on their steering prompts in real time.
 - **Key reference:** Schön, D. A. (1983). *The Reflective Practitioner: How Professionals Think in Action*. Basic Books.
 - **Alternative considered (optional):** Kolb's Experiential Learning Cycle (rejected because it is too broad; Schön's emphasis on professionals "talking back to the situation" fits the dialogic human-agent steering process much more precisely).

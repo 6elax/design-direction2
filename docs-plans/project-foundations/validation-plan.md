@@ -14,14 +14,13 @@ What we're trying to learn, organized by categories that span our integrated app
 
 Building a deeper understanding of the user and community ecosystem — surfacing insights about needs and contextual, systemic risks that shape what to design.
 
-1. **H1: Error & Friction Overlap** *(Open Question — MVP 1).* Do different project teams/members working in the same cohort hit overlapping conceptual, design, technical, or steering challenges, or are their friction profiles entirely isolated? *Why it matters:* If different teams have zero overlap in their challenges, a shared community log database will provide zero utility.
+1. **H1: Error & Friction Overlap** *(Open Question — MVP 1).* Do different project teams/members working in the same cohort hit overlapping challenges when abstracted to systems-level design patterns (Socratic Pivots), or are their friction profiles entirely isolated? *Why it matters:* If different teams have zero overlap in their challenges, a shared community log database will provide zero utility.
 2. **H2: Steering Breakdown Signal** *(Open Question — MVP 2).* What interaction signals (e.g. error rate, typing idle time, file reversions) reliably indicate a cohort member has hit a conceptual "breakdown" in agent steering? *Why it matters:* Understanding these signals is necessary to trigger mixed-initiative helper agent offers without annoying the user.
-
 ### Value: Product-Market Fit, Demand & Growth
 
 Does the product solve a felt need, and will people adopt and spread it? These questions determine whether the solution is viable as a sustained offering.
 
-3. **H3: Value of Peer Dialogue** *(Prediction — MVP 1).* Cohort members will actively choose to review peer transcripts/highlights to solve roadblocks instead of guessing or asking lab leads. *Why it matters if wrong:* If members prefer asking coordinators directly regardless of peer logs, the tool's adoption will fail.
+3. **H3: Value of Peer Dialogue** *(Prediction — MVP 1).* Cohort members will value peer Socratic pivot questions but reject *manual* log registries. Suggestion cards must be proactively recommended using background telemetry matching. *Why it matters if wrong:* If members prefer asking coordinators directly regardless of peer logs, the tool's adoption will fail.
 4. **H4: Scaffolding vs. Direct Answers** *(Prediction — MVP 2).* Cohort members will adopt a constrained diagnostic helper agent that does *not* generate direct answers/code, even though an automated assistant is faster, because they value learning the underlying steering competency. *Why it matters if wrong:* If users reject diagnostic guidance in favor of raw copy-paste answer generation, our educational value proposition collapses.
 
 ### Design: Embodiment & Experience
@@ -29,7 +28,7 @@ Does the product solve a felt need, and will people adopt and spread it? These q
 How users interpret and interact with the design — the design conjectures and experiential insights that shape the next design iteration and design theory.
 
 5. **H5: Auxiliary Pane Usability** *(Open Question — MVP 2).* Does rendering the Level 1 Inline Card and Level 2 Workspace Case Studies inside the right-side Artifacts panel (HTML Auxiliary Pane) provide a seamless side-by-side debugging and planning experience, or does it clutter the member's workspace layout? *Why it matters:* Determines whether the system can adapt to standard desktop environments (like Antigravity 2.0) without needing custom Electron sidebar UI overlays.
-6. **H6: Summary Preview and 2-Question Reflection** *(Prediction — MVP 3).* Providing a real-time summary preview of the logged data (using `--mode preview` on transcript logs) combined with a simplified 2-question reflection card will increase user trust and reflection quality, while avoiding compliance gaming without triggering task abandonment. *Why it matters:* Balances user transparency against logging friction.
+6. **H6: Summary Preview and 1-Sentence Reflection** *(Prediction — MVP 3).* Providing a real-time summary preview of the logged data (using `--mode preview` on transcript logs) combined with a simplified 1-sentence reflection card will increase user trust and reflection quality, while avoiding compliance gaming without triggering task abandonment. *Why it matters:* Balances user transparency against logging friction.
 
 ### Impact: Mediating Processes & Outcomes
 
@@ -74,7 +73,7 @@ We will deploy our validation sequence across the project teams in our research 
 |---|---|---|---|
 | MVP 1: Retrospective Evaluation | [Date] | Extract historical struggles into a master spreadsheet. Verify accuracy with authors and run cohort cross-reading helpfulness evaluations. | H1 (Roadblock/friction overlap) and H3 (Value of peer logs). |
 | MVP 2: Streamlined Chat Companion | [Date] | Deploy in-chat companion rules and background checking modes, rendering inline suggestion cards in the right-side Artifacts panel for all cohort members. | H2 (Breakdown signals), H4 (Scaffolding adoption), and H5 (Auxiliary pane usability). |
-| MVP 3: Full SkillWeave Deploy | [Date] | Deploy full integration (persistent confirmation cards inside the chat panel, automated transcript-preview scanner, 2-question reflection prompts, real-time seeder writes, and cohort knowledge sharing) across the entire lab cohort. | H6 (Summary preview engagement), H7 (Competency transfer), and H8 (Cohort process adaptation). |
+| MVP 3: Full SkillWeave Deploy | [Date] | Deploy full integration (persistent confirmation cards inside the chat panel, automated transcript-preview scanner, 1-sentence reflection prompts, real-time seeder writes, and cohort knowledge sharing) across the entire lab cohort. | H6 (Summary preview engagement), H7 (Competency transfer), and H8 (Cohort process adaptation). |
 
 ### MVP 1: Retrospective Database Evaluation (No-Code Probe)
 
@@ -114,13 +113,13 @@ Deploy to all active cohort members. We track:
 
 ### MVP 3: Full SkillWeave Deploy (Integrated System)
 
-**Purpose:** Evaluate learning outcomes (reflection quality under preview transparency and competency transfer) and cohort-wide process adaptation. *(Addresses: H6 [Summary Preview and 2-Question Reflection], H7 [Steering Competency Transfer], H8 [Cohort-Wide Process Adaptation])*
+**Purpose:** Evaluate learning outcomes (reflection quality under preview transparency and competency transfer) and cohort-wide process adaptation. *(Addresses: H6 [Summary Preview and 1-Sentence Reflection], H7 [Steering Competency Transfer], H8 [Cohort-Wide Process Adaptation])*
 
 **What we build:**
 The complete integrated system:
 - Persistent confirmation cards in the chat pane that wait for a user's "Resolved" click.
 - Real-time preview generation which scans the conversation transcript logs from bottom to top to identify the recent struggle and modified files.
-- Simplified 2-question reflection toast inside the chat interface.
+- Simplified 1-sentence reflection toast inside the chat interface.
 - Logging modes (`--mode log` invoked in the background) that write directly to the central cloud Supabase database.
 - A shared cohort-wide knowledge dashboard displaying friction patterns pulled from the cloud database.
 
@@ -156,3 +155,4 @@ The researcher's motivation is rooted in personal frustrations with generative A
 - 🔵 **Preference for Simple Wording:** The agent proposed rewriting predictions into strict "If/Then/Because" template formats to ensure testability. The user rejected this, preferring the current high-level wording to keep the document concise and readable.
 
 ### MVP / Protostudy Sequence
+- **Round 1 (Retrospective Evaluation) Revisions:** Revised H1 (Error & Friction Overlap) and H3 (Value of Peer Dialogue) to reflect that overlap is unlocked through Socratic abstraction and manual log lookups fail due to lookup friction. Expanded MVP 2 scope to enforce strict max-2 concise Socratic questions, a human-in-the-loop validation gate, and a manual keyword search fallback.
