@@ -62,7 +62,7 @@ Does constraining assistant outputs and aggregating transcripts successfully dri
 For small cohort environments (e.g., a summer research cohort consisting of ~10 members across 3 teams), participants are allocated progressively across the evaluation phases:
 
 *   **MVP 1 (Retrospective Evaluation):** Evaluated against **all cohort members** (~10 people). We parse and synthesize historical logs from previous quarters/weeks (Iris, Alexis, Varia, etc.) into a master spreadsheet. We verify accuracy with the original authors and run cross-reading helpfulness evaluations with the rest of the cohort.
-*   **MVP 2 (Streamlined Chat Companion Prototype):** Deployed to **all active teams** (~10 people) during a real coding sprint. Because generating the companion rules and system cards is rapid, we skip manual live-logging and immediately test the Socratic interface constraints, auxiliary pane layout, and live telemetry capture.
+*   **MVP 2 (Streamlined Chat Companion Prototype):** Deployed to **up to 5 cohort members** during a 5-day workflow sprint. Because generating the companion rules and system cards is rapid, we skip manual live-logging and immediately test the Socratic interface constraints, auxiliary pane layout, and live telemetry capture.
 *   **MVP 3 (Full Deploy):** Deployed to **all active teams** (entire 10-person cohort) to measure steering competency transfer and cohort-wide process adaptation over a multi-week deployment.
 
 ### Timeline
