@@ -10,7 +10,7 @@
 
 Before we can build an integrated, automated double-loop learning system for the whole lab cohort, we need to test whether cohort members (builders) will adopt a constrained, Socratic diagnostic helper and if the right-side Auxiliary Pane (the IDE's native Artifacts panel) provides a seamless side-by-side workflow experience. This study deploys an in-chat companion integration that proactively matches active tasks to peer Socratic case studies, rendering suggestions in the right-side Artifacts panel.
 
-Based on MVP 1 findings, we have pivoted from a dashboard-centered manual search tool to a proactive, telemetry-triggered suggestion companion. To minimize reading fatigue and prevent task abandonment, suggestion cards enforce a strict maximum limit of two concise questions. Reflections are gathered using low-friction in-situ resolution detection popups, rather than forced post-hoc forms.
+Based on MVP 1 findings, we have pivoted from a dashboard-centered manual search tool to a proactive, telemetry-triggered suggestion companion. To minimize reading fatigue and prevent task abandonment, suggestion cards enforce a strict maximum limit of two concise questions. Reflections are gathered using a low-friction Persistent Artifact Card (resolve_query.md) and Collaborative Review Card (pending_struggle_log.md), rather than forced post-hoc forms.
 
 ### What We're Testing & Exploring
 
@@ -30,9 +30,9 @@ Beyond testing assumptions, we explore the community-wide learning experience:
 A lightweight in-chat companion prototype that watches active conversations and presents peer Socratic case studies in the right-side Artifacts panel.
 
 *   **In-Chat Checking Harness & Telemetry Gating** — A script (`skill-weave-agent.ts`) invoked by chat hooks at the end of each turn that runs checking (`--mode check`) and logging (`--mode log`) against the remote database. It uses telemetry metrics (idle times, reversion counts) to gate matches and prevent false-positive interruptions.
-*   **Interactive Socratic Logging Gating** — Once a struggle is resolved (either detected by the agent or declared by the user), the assistant runs NLU synthesis to extract the roadblock, resolution, metacognitive pattern, and Socratic pivot questions, presenting them in a review card (`pending_struggle_log.md`). The user can review, edit, and approve the details before they are committed to Supabase.
+*   **Interactive Socratic Logging Gating** — Once a struggle is resolved (either detected by the agent or declared by the user), the assistant runs NLU synthesis to extract the roadblock and resolution, presenting them in a review card (`pending_struggle_log.md`). The user can review, edit, and approve the details before they are committed to Firebase Firestore.
 *   **Artifact-Based Suggestion Card (Level 1)** — Outputs a concise card (`peer_suggestion_card.md`) to the active conversation directory, prompting the IDE to open it in the right-side panel. It enforces a strict UI limit of **maximum 2 concise Socratic questions** to prevent reading fatigue.
-*   **Socratic Workspace Pane (Level 2)** — A markdown file (`peer-workspace-pane.md`) detailing peer reflections, comparative file diffs, and Socratic contrast questions.
+*   **Socratic Workspace Pane (Level 2)** — A markdown file (`peer-workspace-pane.md`) detailing peer roadblocks/summaries, Socratic contrast questions, comparative diffs, and verbatim dialogue history.
 *   **Cross-Domain Explanation Pipeline** — An automated generation pipeline that translates domain-specific details into plain, generalized lessons so that members from different project areas can immediately grasp the roadblock's core lesson.
 *   **Manual Keyword Search Fallback** — A search box widget in the Workspace Pane allowing manual query fallbacks if telemetry triggering fails.
 *   **Onboarding Expectation Gating (Anti-Lazy Prompting Warning)** — Frames intentional prompting as an effectiveness trade-off (*"the tool will be less effective if you write lazy prompts"*).
@@ -49,7 +49,7 @@ This round tests the Socratic intervention flow under a low-code infrastructure,
 Lightweight background checking triggered by the agent execution environment.
 *   **In-Chat Hook Checker** — A script (`skill-weave-agent.ts`) invoked by chat hooks at the end of each turn that runs checking (`--mode check`) and logging (`--mode log`) against the remote database using cohort-wide search routing.
 *   **Telemetry Logger** — Logs typing speed, idle time, reversion counts, and error frequencies to map breakdown signals (H2).
-*   **NLU Synthesis Engine** — Synthesizes the active conversation transcript to extract the struggle roadblock, resolution, metacognitive pattern, and Socratic pivot questions.
+*   **NLU Synthesis Engine** — Synthesizes the active conversation transcript to extract the struggle roadblock and resolution.
 *   **Interactive Review Gating** — Writes the generated case study to `pending_struggle_log.md` and prompts the user for verification/edits before committing.
 
 ### Feature 2: Artifact-Based Suggestion Card (Level 1)
@@ -78,7 +78,7 @@ Automated system monitoring.
 *   **Trigger accuracy** — We track idle time vs. actual compile/syntax errors to refine H2.
 *   **Card dismissals** — We count how many suggestion cards are dismissed within 5 seconds.
 *   **Workspace Pane Navigation** — We track whether builders open the Level 2 Peer Workspace Pane or just close/ignore the Level 1 card.
-*   **In-Situ Resolution Responses** — We track the response rate to the popup queries.
+*   **Review Card Approvals** — We track the click/approval rate of the review cards and the frequency of user comments.
 
 ### User Survey Sequence
 Three-part Google Forms surveys.
@@ -102,7 +102,7 @@ We're on the right track if builders successfully diagnose steering issues using
 **Signals that prompt reconsideration:**
 *   Over 60% of suggestion cards are dismissed immediately (dismissed within 5 seconds).
 *   Builders consistently report that the right-side panel clutters their workspace (H5) or that Socratic prompts are too slow and annoying, preferring standard direct-answer chatbots (H4).
-*   The in-situ popup is dismissed or ignored >80% of the time, or user edits in the confirmation gate are completely bypassed.
+*   The resolve check card is ignored >80% of the time, or users click Proceed on the review card without reviewing/commenting.
 
 **Thresholds for directional intuition:**
 

@@ -1,15 +1,17 @@
+## Antigravity SkillWeave Trigger Rules
 
-
-## Antigravity SkillWeave Trigger Hook
 At the end of every conversational turn:
-1. Wait for the agent-reflections skill to scan the transcript.
-2. If the reflections agent identifies a struggle, pass the type and struggle text directly to the SkillWeave script:
-   `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode check --type "[TYPE]" --struggle "[STRUGGLE_TEXT]" --workspace-root "<project-root>"`
-3. If similar peer cases are found (Match Score >= 1), prepend the Level 1 Inline suggestion card above the prompt input window:
-   "💡 Peer Match Found (94% confidence) — Teammate resolved a similar error. [🔍 Open Peer Workspace Pane]"
-4. Upon task resolution (when the developer declares "Resolved" or the compiler block is cleared):
-   - **Extract and Analyze:** Use NLU to analyze the conversation transcript and compile the case study (Roadblock/Insight, Resolution/Example, Metacognitive Pattern, and Socratic Pivot Questions).
-   - **Generate Review Artifact:** Write this metadata directly to a markdown file `pending_struggle_log.md` in the active conversation directory, formatted with fields that the developer can edit. Set `RequestFeedback: true` in the file's metadata to present an interactive "Proceed" confirmation button in the chat pane.
-   - **Wait for Developer Approval:** Wait for the developer to review and optionally edit the log details in the editor, then click **Proceed** (or reply "Approve").
-   - **Upload to Cloud DB:** Once approved, read the finalized file and commit the parsed data to the Supabase database:
-     `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode log --workspace-root "<project-root>" --payload '{"type":"[TYPE]","key":"[KEY]","insight":"[INSIGHT]","example":"[EXAMPLE]","conversation-id":"[CONVERSATION_ID]","author":"[AUTHOR]","metacognitive_pattern":"[PATTERN]","socratic_pivot":"[QUESTIONS]"}'`
+1. **Command: /search [query]**: If the user types `/search [query]`, the agent must run the check command:
+   `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode check --struggle "[QUERY]" --workspace-root "<project-root>"`
+   It displays the Socratic query results directly in the chat, and offers to open the peer workspace pane.
+2. **Command: /stuck**: If the user types `/stuck` or if the telemetry watcher intercepts a high-friction struggle (e.g. 3 consecutive compile errors or prompt reversions), the agent must:
+   - Print a confirmation in chat: *"Roadblock tagged. I'm tracking this struggle. Type `/resolved` when you've solved it."*
+   - Query Firebase Firestore for matching struggles, analyze context, and print custom Socratic pivot questions directly in the chat.
+3. **Command: /resolved**: If the user types `/resolved`, the agent must:
+   - Run NLU synthesis to extract the Roadblock and Resolution from the dialogue block (spanning from the `/stuck` trigger all the way to `/resolved`).
+   - Run: `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode draft-log --transcript "[TRANSCRIPT]" --id "[CONVERSATION_ID]" --workspace-root "<project-root>"` to generate `.t4g/skill-weave/pending_struggle_log.md` with a native `Proceed` button.
+   - Print a prompt in the chat: *"I've generated your review card on the right side. Leave comments for edits, and click Proceed when ready."*
+4. **Approve / Proceed**: When the user clicks **Proceed** on the `pending_struggle_log.md` Artifact:
+   - Read the file content and apply any comments left by the user.
+   - Run the log command to upload to Firebase Firestore:
+     `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode log --file ".t4g/skill-weave/pending_struggle_log.md" --workspace-root "<project-root>"`

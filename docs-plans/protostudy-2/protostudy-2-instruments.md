@@ -20,7 +20,7 @@ This companion document holds the operational detail for data collection for MVP
 
 ### 2. During-Use Survey (Trigger-Gated Reflections)
 *   **Form URL**: [https://forms.gle/3F4GkdkBAgjuzuoFA](https://forms.gle/3F4GkdkBAgjuzuoFA)
-*   **Timing**: Users fill this out whenever a struggle is resolved and logged by the SkillWeave in-chat companion (triggered by the in-situ resolved popup).
+*   **Timing**: Users fill this out whenever a struggle is resolved and logged by the SkillWeave in-chat companion (triggered by the pending_struggle_log.md review card approval).
 *   **Reflective & Assessment Lenses**:
     - **Logged vs. Provided Help**:
         1. *Did the peer match preview summary capture your actual struggle accurately?* (1 = Not at all, 5 = Perfectly).
@@ -28,7 +28,7 @@ This companion document holds the operational detail for data collection for MVP
         3. *Did the Socratic prompt or comparative diff help you resolve your roadblock?* (1 = Not at all, 5 = Completely).
         4. *Did you open the Level 2 Peer Workspace Pane?* (Yes/No).
         5. *If you opened it, did you use the manual keyword search fallback widget?* (Yes/No).
-        6. *What specific insight did you draw from the peer's reflection/diff?* (Open-ended).
+        6. *What specific insight did you draw from the peer's roadblock summary or diff?* (Open-ended).
     - **Socratic Reflection (Optional - "Soft Log")**:
         1. *What did the agent do unexpectedly or incorrectly that led to the roadblock?* (Open-ended).
         2. *How did you steer the agent to resolve the issue?* (Open-ended).
@@ -38,7 +38,7 @@ This companion document holds the operational detail for data collection for MVP
 *   **Timing**: Administered at the end of the 5-day pilot study.
 *   **Usability & Competency Scales**:
     - Subjective usability rating of the suggestion cards (Level 1) and Workspace Pane (Level 2).
-    - Perceived utility of peer Socratic reflections compared to documentation or web search.
+    - Perceived utility of peer Socratic case studies compared to documentation or web search.
     - Perceived change in individual agent-steering competency across coding, planning, and design.
     - Frequency of task abandonment or bypass when encountering suggestion cards.
     - Perceived clutter or screen-space distraction of the right-side Artifacts panel (H5).
@@ -57,7 +57,7 @@ Open-ended questions for 15-minute debrief conversations.
 ### Core Questions (Product dimensions)
 1. "When the SkillWeave matching card appeared in your Artifacts panel, what was your immediate reaction? Did it feel like a distraction or a resource? Did the limit of 2 Socratic questions make you more or less likely to read it?"
 2. "Walk me through how you used the Peer Workspace Pane. Did you read only the summary, or did you look at the Socratic questions and diffs? Did you ever use the manual keyword search fallback?"
-3. "We allowed you to skip writing Socratic reflections (the 'soft log') and used a popup query to check when you resolved your struggle. How did that popup flow feel? Did you skip reflections often? What would have motivated you to write one?"
+3. "We allowed you to review and edit AI-drafted Socratic reflections in pending_struggle_log.md before logging. How did that review card flow feel? Did it feel like a helpful pause or an annoying blocker? Did you skip reflections often, and what would have motivated you to edit or write more?"
 4. "Did you notice the onboarding warning about how lazy prompts affect tool accuracy? Did that influence how you prompted the agent?"
 
 ### Research Probes (Phenomenon exploration)
@@ -71,7 +71,7 @@ Open-ended questions for 15-minute debrief conversations.
 | What to watch | When/where | Connects to |
 |---|---|---|
 | **Workspace Pane Navigation Rate** | When Level 2 Socratic Workspace Pane is opened | **H5**: Do users click and use the right-side panel for comparative diffs, or does it clutter their workflow? |
-| **In-Situ Response & Voluntary Reflection Rate** | When the resolved popup query is triggered | **H4**: Do builders respond to the in-situ query and willingly write reflections, or does the "soft log" option lead to complete bypass? |
+| **Review Card Approval & Edit Rate** | When the pending_struggle_log.md card is generated | **H4**: Do builders approve the review card and willingly make edits, or do they close/bypass the file? |
 | **Struggle Intercept Rate** | In-chat companion telemetry logs | **H2**: How accurately do keyboard idle times and file reversions flag conceptual/technical breakdowns? |
 | **Manual Search Fallback Usage** | Telemetry logs on search box queries | **Exploration**: How often do automated telemetry triggers fail, requiring manual search overrides? |
 
