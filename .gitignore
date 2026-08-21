@@ -1,3 +1,5 @@
 
 # Ignore local agent memory and database binaries
 .t4g/
+
+.t4g/skill-weave/

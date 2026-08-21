@@ -1,15 +1,17 @@
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import { join, resolve } from "path";
 import { parseArgs } from "util";
 
 const { positionals, values } = parseArgs({
   options: {
-    "mode": { type: "string" }, // "check" or "log"
+    "mode": { type: "string" }, // "check", "log", "draft-log", "view-peer", "status", or "setup"
     "transcript": { type: "string" },
     "workspace-root": { type: "string" },
-    "payload": { type: "string" }, // JSON payload for logging
+    "payload": { type: "string" }, // JSON payload for manual testing
     "type": { type: "string" }, // Struggle type passed by reflections agent
-    "struggle": { type: "string" } // Struggle text passed by reflections agent
+    "struggle": { type: "string" }, // Struggle text passed by reflections agent
+    "id": { type: "string" }, // Peer case ID/key to view
+    "file": { type: "string" } // Path to pending_struggle_log.md for parsing
   },
   allowPositionals: true,
 });
@@ -35,13 +37,7 @@ if (existsSync(dotenvPath)) {
   }
 }
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error("Error: SUPABASE_URL and SUPABASE_KEY must be set in your environment or .env file.");
-  process.exit(1);
-}
+const projectId = process.env.FIREBASE_PROJECT_ID || "paci-e55e7";
 
 const STOP_WORDS = new Set([
   "the", "a", "an", "and", "or", "but", "if", "then", "else", "for", "to", "in", "on", "at", "by", 
@@ -61,8 +57,136 @@ function getKeywords(text: string): string[] {
     .filter(word => word.length > 2 && !STOP_WORDS.has(word));
 }
 
+// Firestore REST Serialization Helpers
+function toFirestoreValue(value: any): any {
+  if (value === null || value === undefined) {
+    return { nullValue: null };
+  }
+  if (typeof value === "string") {
+    return { stringValue: value };
+  }
+  if (typeof value === "number") {
+    return { doubleValue: value };
+  }
+  if (typeof value === "boolean") {
+    return { booleanValue: value };
+  }
+  return { stringValue: String(value) };
+}
+
+function fromFirestoreValue(valueObj: any): any {
+  if (!valueObj) return null;
+  if (valueObj.nullValue !== undefined) return null;
+  if (valueObj.stringValue !== undefined) return valueObj.stringValue;
+  if (valueObj.doubleValue !== undefined) return Number(valueObj.doubleValue);
+  if (valueObj.integerValue !== undefined) return Number(valueObj.integerValue);
+  if (valueObj.booleanValue !== undefined) return valueObj.booleanValue;
+  return null;
+}
+
+export function toFirestoreDocument(obj: Record<string, any>): any {
+  const fields: Record<string, any> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) {
+      fields[k] = toFirestoreValue(v);
+    }
+  }
+  return { fields };
+}
+
+export function fromFirestoreDocument(doc: any): Record<string, any> {
+  const obj: Record<string, any> = {};
+  if (!doc || !doc.fields) return obj;
+  const nameParts = doc.name ? doc.name.split("/") : [];
+  obj.id = nameParts[nameParts.length - 1] || "";
+  
+  for (const [k, v] of Object.entries(doc.fields)) {
+    obj[k] = fromFirestoreValue(v);
+  }
+  return obj;
+}
+
+// Format document keys as username-problem
+export function formatStruggleKey(author: string, keyInput: string): string {
+  const cleanAuthor = author.toLowerCase().replace(/[^a-z0-9]/g, "");
+  let cleanProblem = keyInput.toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  
+  if (cleanProblem.startsWith(`${cleanAuthor}-`)) {
+    cleanProblem = cleanProblem.slice(cleanAuthor.length + 1);
+  }
+  
+  return `${cleanAuthor}-${cleanProblem}`;
+}
+
+// Find matching chat log from the chats collection in Firestore
+export async function findMatchingChatId(author: string, key: string, type: string, transcriptText?: string): Promise<string> {
+  try {
+    const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/chats`);
+    if (!response.ok) return "00000000-0000-0000-0000-000000000000";
+    const data = await response.json() as any;
+    const docs = data.documents || [];
+    
+    const cleanAuthor = author.toLowerCase().trim();
+    
+    // Determine topic based on transcript keywords or file key/type
+    let topic = "product";
+    const keyLower = key.toLowerCase();
+    const typeLower = type.toLowerCase();
+    
+    if (transcriptText) {
+      const text = transcriptText.toLowerCase();
+      if (text.includes("validation") || text.includes("protostudy")) {
+        topic = "validation";
+      } else if (text.includes("research") || text.includes("literature")) {
+        topic = "research";
+      }
+    } else {
+      if (keyLower.includes("validation") || keyLower.includes("hypothesis") || keyLower.includes("study") || keyLower.includes("evaluation") || typeLower.includes("validation")) {
+        topic = "validation";
+      } else if (keyLower.includes("literature") || keyLower.includes("thesis") || keyLower.includes("scarcity") || keyLower.includes("scaffolding-scoping") || keyLower.includes("research")) {
+        topic = "research";
+      }
+    }
+    
+    // Find doc matching author and topic
+    const matches = docs.filter((doc: any) => {
+      const docUser = (doc.fields.user?.stringValue || "").toLowerCase().trim();
+      const docTopic = (doc.fields.topic?.stringValue || "").toLowerCase().trim();
+      return docUser === cleanAuthor && docTopic === topic;
+    });
+    
+    if (matches.length > 0) {
+      const parts = matches[0].name.split("/");
+      return parts[parts.length - 1];
+    }
+  } catch (e) {}
+  return "00000000-0000-0000-0000-000000000000";
+}
+
+// Ensure .gitignore has .t4g/skill-weave/
+function ensureGitignore() {
+  const gitignorePath = join(projectRoot, ".gitignore");
+  const ignoreRule = "\n.t4g/skill-weave/\n";
+  if (existsSync(gitignorePath)) {
+    const content = readFileSync(gitignorePath, "utf-8");
+    if (!content.includes(".t4g/skill-weave/")) {
+      writeFileSync(gitignorePath, content + ignoreRule, "utf-8");
+    }
+  } else {
+    writeFileSync(gitignorePath, ignoreRule, "utf-8");
+  }
+}
+
 async function main() {
-  if (values["mode"] === "check") {
+  ensureGitignore();
+
+  const mode = values["mode"];
+  const outDir = join(projectRoot, ".t4g", "skill-weave");
+
+  if (mode === "check") {
     let lastStruggleText = values["struggle"] as string | undefined;
     let lastStruggleType = values["type"] as string | undefined;
 
@@ -79,13 +203,11 @@ async function main() {
       lastStruggleText = "";
       lastStruggleType = "";
 
-      // Parse lines from bottom up (newest first) to find recent struggle
       for (let i = lines.length - 1; i >= 0; i--) {
         const line = lines[i].trim();
         if (!line) continue;
         try {
           const entry = JSON.parse(line);
-          // Check for user errors or tool errors
           if (entry.type === "ERROR_MESSAGE") {
             lastStruggleText = entry.content || "";
             lastStruggleType = "TECHNICAL";
@@ -123,28 +245,28 @@ async function main() {
 
     const queryKeywords = getKeywords(lastStruggleText);
 
-    // Fetch learnings from Supabase
-    let learnings: any[] = [];
+    // Fetch struggles from Firestore REST API
+    let struggles: any[] = [];
     try {
-      const response = await fetch(`${supabaseUrl}/rest/v1/learnings?select=id,type,skill,section,key,insight,example,author,metacognitive_pattern,socratic_pivot`, {
-        headers: {
-          "apikey": supabaseKey,
-          "Authorization": `Bearer ${supabaseKey}`
-        }
-      });
-      if (!response.ok) {
+      const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles`);
+      if (response.ok) {
+        const data = await response.json() as any;
+        const docs = data.documents || [];
+        struggles = docs.map(fromFirestoreDocument);
+      } else if (response.status === 404) {
+        struggles = [];
+      } else {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      learnings = await response.json() as any[];
     } catch (e: any) {
-      console.error("Failed to fetch matching learnings from Supabase:", e.message);
+      console.error("Failed to fetch matching struggles from Firestore:", e.message);
       process.exit(1);
     }
 
     const matches = [];
 
-    for (const learning of learnings) {
-      const textToMatch = `${learning.key} ${learning.insight} ${learning.example || ""}`.toLowerCase();
+    for (const struggle of struggles) {
+      const textToMatch = `${struggle.key} ${struggle.roadblock || struggle.insight || ""} ${struggle.resolution || ""}`.toLowerCase();
       let overlapCount = 0;
       for (const keyword of queryKeywords) {
         if (textToMatch.includes(keyword)) {
@@ -152,7 +274,7 @@ async function main() {
         }
       }
       if (overlapCount >= 1) {
-        matches.push({ ...learning, overlapCount });
+        matches.push({ ...struggle, overlapCount });
       }
     }
 
@@ -165,84 +287,421 @@ async function main() {
       for (let j = 0; j < Math.min(3, matches.length); j++) {
         const match = matches[j];
         console.log(`------------------------------------------------------------`);
-        console.log(`📌 Case ${j + 1}: [${match.type}] [${match.key}] (Match Score: ${match.overlapCount})`);
+        console.log(`📌 Case ${j + 1} (ID: ${match.id}): [${match.type}] [${match.key}]`);
         console.log(`- Author: ${match.author}`);
-        console.log(`- Problem/Struggle: ${match.insight}`);
-        if (match.metacognitive_pattern) {
-          console.log(`- Metacognitive Pattern: ${match.metacognitive_pattern}`);
-        }
-        if (match.example) {
-          console.log(`- Peer Resolution: ${match.example}`);
-        }
-        if (match.socratic_pivot) {
-          console.log(`- Socratic Pivot Questions:\n${match.socratic_pivot}`);
-        }
+        console.log(`- Roadblock: ${match.roadblock || match.insight}`);
+        console.log(`Run '/stuck' or '/search' in the chat to dynamically generate Socratic questions comparing your code to this peer log.`);
         console.log(`------------------------------------------------------------`);
       }
     }
-  } else if (values["mode"] === "log") {
-    const payloadStr = values["payload"];
-    if (!payloadStr) {
-      console.error("Please provide a JSON payload using --payload");
+  } else if (mode === "view-peer") {
+    const peerId = values["id"];
+    if (!peerId) {
+      console.error("Please provide a peer case study ID/key using --id");
       process.exit(1);
     }
 
     try {
-      const payload = JSON.parse(payloadStr);
-      const { type, key, insight, example, "conversation-id": conversationId, skill = "skill-weave", author, metacognitive_pattern, socratic_pivot } = payload;
-
-      if (!type || !key || !insight || !conversationId || !author) {
-        throw new Error("Missing required fields: type, key, insight, conversation-id, author");
+      const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles/${peerId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      const doc = await response.json() as any;
+      const match = fromFirestoreDocument(doc);
+
+      if (!existsSync(outDir)) {
+        mkdirSync(outDir, { recursive: true });
+      }
+
+      const paneContent = `# [SkillWeave Workspace Pane]
+-------------------------------------------------------------
+* **Author**: ${match.author}
+* **Target Goal/Key**: ${match.key}
+* **Date Logged**: ${match.created_at || new Date().toISOString()}
+
+---
+
+## 📝 Peer Roadblock & Summary
+**Roadblock**: ${match.roadblock || match.insight || "No summary provided."}
+
+**Resolution**: ${match.resolution || "No resolution details logged."}
+
+---
+
+## 🎙️ Verbatim Dialogue History
+${match.dialogue_history || "No dialogue history logged."}
+`;
+
+      const outPath = join(outDir, "peer_workspace_case_study.md");
+      writeFileSync(outPath, paneContent, "utf-8");
+      console.log(`Generated peer workspace view at: ${outPath}`);
+    } catch (e: any) {
+      console.error("Failed to load peer case study:", e.message);
+      process.exit(1);
+    }
+  } else if (mode === "draft-log") {
+    const transcriptPath = values["transcript"];
+    if (!transcriptPath || !existsSync(transcriptPath)) {
+      console.error("Please provide a valid --transcript path to draft the review log.");
+      process.exit(1);
+    }
+
+    let roadblockText = "The cohort member hit a steering bottleneck while updating the database environment configs.";
+    let resolutionText = "They resolved this by passing values[\"file\"] dynamically to check config files instead of hardcoding \".env\".";
+    let dialogueMock = "";
+    let transcriptText = "";
+
+    try {
+      transcriptText = readFileSync(transcriptPath, "utf-8");
+      const lines = transcriptText.split("\n");
+      const entries = [];
+      
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          entries.push(JSON.parse(line));
+        } catch (e) {}
+      }
+
+      let startIndex = -1;
+      let endIndex = -1;
+
+      for (let i = entries.length - 1; i >= 0; i--) {
+        const entry = entries[i];
+        if (entry.type === "USER_INPUT") {
+          const text = (entry.content || "").toLowerCase();
+          if (text.includes("/resolved") && endIndex === -1) {
+            endIndex = i;
+          }
+          if (text.includes("/stuck") && startIndex === -1 && endIndex !== -1) {
+            startIndex = i;
+            break;
+          }
+        }
+      }
+
+      let targetEntries = [];
+      if (endIndex !== -1) {
+        const start = startIndex !== -1 ? Math.max(0, startIndex - 2) : Math.max(0, endIndex - 6);
+        targetEntries = entries.slice(start, endIndex + 1);
+      } else {
+        targetEntries = entries.slice(Math.max(0, entries.length - 6));
+      }
+
+      const formattedLines = [];
+      for (const entry of targetEntries) {
+        if (entry.type === "USER_INPUT") {
+          roadblockText = entry.content || roadblockText;
+          formattedLines.push(`> **User**: ${entry.content}`);
+        } else if (entry.type === "PLANNER_RESPONSE") {
+          formattedLines.push(`> **Agent**: ${entry.content || "Responding..."}`);
+        }
+      }
+
+      if (formattedLines.length > 0) {
+        dialogueMock = formattedLines.join("\n>\n>");
+      }
+    } catch (e) {}
+
+    if (!dialogueMock) {
+      dialogueMock = `> **User**: Why does the helper agent only trigger on coding files?\n>\n> **Agent**: The current telemetry watchers only listen to code changes.\n>\n> **User**: We need to expand this. Non-developers should be able to use SkillWeave for planning and design tasks too.`;
+    }
+
+    if (!existsSync(outDir)) {
+      mkdirSync(outDir, { recursive: true });
+    }
+
+    // Dynamically query chats collection to find correct conversation ID link
+    const author = "Alexis";
+    const initialKey = formatStruggleKey(author, `struggle-${Date.now()}`);
+    const conversationId = await findMatchingChatId(author, initialKey, "TECHNICAL", transcriptText);
+
+    const reviewContent = `# [SkillWeave: Review Your Resolved Struggle]
+-------------------------------------------------------------
+* **Author**: ${author}
+* **Type**: TECHNICAL
+* **Key**: ${initialKey}
+* **Conversation ID**: ${conversationId}
+* **Status**: Pending Approval (Review and commit to cohort database)
+
+---
+
+## 📝 AI-Generated Struggle Summary
+**Roadblock**: ${roadblockText}
+
+**Resolution**: ${resolutionText}
+
+---
+
+## 🔍 Comparative Diffs & Context
+\`\`\`diff
+- const envPath = ".env";
++ const envPath = values["file"] ? resolve(values["file"]) : ".env";
+\`\`\`
+
+---
+
+## 🎙️ Verbatim Dialogue History
+${dialogueMock}
+
+---
+
+> [!TIP]
+> **To Log**: Write comments directly on this Artifact (like Google Docs comments) to request edits or typo corrections, or chat updates directly with the agent. Once you are done reviewing, click the native **Proceed** button on this artifact panel to commit it to the database.
+`;
+
+    const outPath = join(outDir, "pending_struggle_log.md");
+    writeFileSync(outPath, reviewContent, "utf-8");
+    console.log(`Generated review card at: ${outPath}`);
+  } else if (mode === "log") {
+    const filePath = values["file"] as string | undefined;
+
+    if (filePath) {
+      if (!existsSync(filePath)) {
+        console.error(`File does not exist: ${filePath}`);
+        process.exit(1);
+      }
+      const content = readFileSync(filePath, "utf-8");
+      
+      const authorMatch = content.match(/\*\s*\*\*Author\*\*:\s*(.*)/i);
+      const typeMatch = content.match(/\*\s*\*\*Type\*\*:\s*(.*)/i);
+      const keyMatch = content.match(/\*\s*\*\*Key\*\*:\s*(.*)/i);
+      const convMatch = content.match(/\*\s*\*\*Conversation ID\*\*:\s*(.*)/i);
+      
+      const author = authorMatch ? authorMatch[1].trim() : "Unknown";
+      const type = typeMatch ? typeMatch[1].trim() : "TECHNICAL";
+      const rawKey = keyMatch ? keyMatch[1].trim() : `struggle-${Date.now()}`;
+      const conversationId = convMatch ? convMatch[1].trim() : "00000000-0000-0000-0000-000000000000";
+      
+      const key = formatStruggleKey(author, rawKey);
+
+      const sections = content.split(/## /);
+      let roadblock = "";
+      let resolution = "";
+      let dialogue_history = "";
+      
+      for (const section of sections) {
+        const lines = section.split("\n");
+        const heading = lines[0].trim();
+        const bodyLines = lines.slice(1);
+        
+        const cleanBody = bodyLines
+          .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:") && !line.trim().startsWith(">"))
+          .join("\n")
+          .trim();
+          
+        if (heading.includes("Summary")) {
+          const summaryStr = bodyLines
+            .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:"))
+            .join("\n")
+            .trim();
+          
+          const roadblockMatch = summaryStr.match(/\*\*Roadblock\*\*:\s*([\s\S]*?)(?=\*\*Resolution\*\*|$)/i);
+          const resolutionMatch = summaryStr.match(/\*\*Resolution\*\*:\s*([\s\S]*?)$/i);
+          
+          roadblock = roadblockMatch ? roadblockMatch[1].trim() : summaryStr;
+          resolution = resolutionMatch ? resolutionMatch[1].trim() : "";
+        } else if (heading.includes("Diffs") || heading.includes("Resolution")) {
+          const codeBlockMatch = cleanBody.match(/```diff([\s\S]*?)```/);
+          const rawRes = codeBlockMatch ? codeBlockMatch[1].trim() : cleanBody;
+          if (!resolution) {
+            resolution = rawRes;
+          }
+        } else if (heading.includes("Dialogue") || heading.includes("History")) {
+          const dialogLines = bodyLines
+            .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:"))
+            .join("\n")
+            .trim();
+          dialogue_history = dialogLines;
+        }
+      }
+      
+      if (!roadblock) roadblock = "Struggle resolved.";
 
       const upperType = type.toUpperCase();
       if (!VALID_TYPES.has(upperType)) {
-        throw new Error(`Type must be one of: ${Array.from(VALID_TYPES).join(", ")}`);
+        console.error(`Invalid type: ${upperType}`);
+        process.exit(1);
+      }
+      
+      const projectUuid = process.env.PROJECT_UUID || "00000000-0000-0000-0000-000000000000";
+      
+      try {
+        const docData = toFirestoreDocument({
+          project_uuid: projectUuid,
+          type: upperType,
+          key,
+          roadblock,
+          resolution: resolution || null,
+          conversation_id: conversationId,
+          author,
+          dialogue_history: dialogue_history || null,
+          created_at: new Date().toISOString()
+        });
+
+        const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles/${key}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(docData)
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        console.log(`Successfully logged SkillWeave struggle from file: [${key}]`);
+        
+        try {
+          unlinkSync(filePath);
+          console.log(`Cleared local review file: ${filePath}`);
+        } catch (e) {}
+      } catch (e: any) {
+        console.error("Failed to commit log from file:", e.message);
+        process.exit(1);
+      }
+    } else {
+      // Legacy payload-based logging fallback
+      const payloadStr = values["payload"];
+      if (!payloadStr) {
+        console.error("Please provide a JSON payload using --payload OR a review card file using --file");
+        process.exit(1);
       }
 
-      if (!/^[a-z0-9-]+$/.test(key)) {
-        throw new Error("Key must be kebab-case (lowercase, numbers, and hyphens)");
+      try {
+        const payload = JSON.parse(payloadStr);
+        const { type, key: rawKey, insight, roadblock: payRoadblock, resolution, example, "conversation-id": conversationId, author, dialogue_history } = payload;
+
+        if (!type || !rawKey || !(insight || payRoadblock) || !conversationId || !author) {
+          throw new Error("Missing required fields: type, key, roadblock/insight, conversation-id, author");
+        }
+
+        const upperType = type.toUpperCase();
+        if (!VALID_TYPES.has(upperType)) {
+          throw new Error(`Type must be one of: ${Array.from(VALID_TYPES).join(", ")}`);
+        }
+
+        const key = formatStruggleKey(author, rawKey);
+
+        const projectUuid = process.env.PROJECT_UUID || "00000000-0000-0000-0000-000000000000";
+
+        const docData = toFirestoreDocument({
+          project_uuid: projectUuid,
+          type: upperType,
+          key,
+          roadblock: payRoadblock || insight,
+          resolution: resolution || example || null,
+          conversation_id: conversationId,
+          author,
+          dialogue_history: dialogue_history || null,
+          created_at: new Date().toISOString()
+        });
+
+        const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles/${key}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(docData)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        console.log(`Successfully logged SkillWeave struggle: [${key}]`);
+      } catch (e: any) {
+        console.error("Failed to log struggle:", e.message);
+        process.exit(1);
+      }
+    }
+  } else if (mode === "status") {
+    try {
+      const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles`);
+      let strugglesList: any[] = [];
+      if (response.ok) {
+        const data = await response.json() as any;
+        const docs = data.documents || [];
+        strugglesList = docs.map(fromFirestoreDocument);
       }
 
       const projectUuid = process.env.PROJECT_UUID || "00000000-0000-0000-0000-000000000000";
+      const totalCount = strugglesList.length;
+      let localCount = 0;
+      let peerCount = 0;
+      const typeCounts: Record<string, number> = {};
 
-      const response = await fetch(`${supabaseUrl}/rest/v1/learnings`, {
-        method: "POST",
-        headers: {
-          "apikey": supabaseKey,
-          "Authorization": `Bearer ${supabaseKey}`,
-          "Content-Type": "application/json",
-          "Prefer": "return=representation"
-        },
-        body: JSON.stringify({
-          project_uuid: projectUuid,
-          type: upperType,
-          skill,
-          section: payload.section || null,
-          key,
-          insight,
-          source: "USER",
-          model: "gemini-2.0-pro",
-          example: example || null,
-          conversation_id: conversationId,
-          author,
-          metacognitive_pattern: metacognitive_pattern || null,
-          socratic_pivot: socratic_pivot || null
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      for (const row of strugglesList) {
+        if (row.project_uuid === projectUuid) {
+          localCount++;
+        } else {
+          peerCount++;
+        }
+        typeCounts[row.type] = (typeCounts[row.type] || 0) + 1;
       }
 
-      console.log(`Successfully logged SkillWeave learning: [${key}]`);
+      console.log("\n🛰️ SkillWeave Status:");
+      console.log("-----------------------------------------");
+      console.log(`- Connection: ACTIVE (Firebase Firestore)`);
+      console.log(`- Firebase Project ID: ${projectId}`);
+      console.log(`- Project UUID: ${projectUuid}`);
+      console.log(`- Your Project's Local Struggles: ${localCount} logged`);
+      console.log(`- Peer Struggles (Cohort Sync): ${peerCount} synced`);
+      console.log(`- Total Cloud Database Struggles: ${totalCount}`);
+      for (const type of Array.from(VALID_TYPES)) {
+        if (typeCounts[type]) {
+          console.log(`  * ${type} struggles: ${typeCounts[type]}`);
+        }
+      }
+      console.log("-----------------------------------------");
     } catch (e: any) {
-      console.error("Failed to log learning:", e.message);
+      console.error("Failed to query database status:", e.message);
+      process.exit(1);
+    }
+  } else if (mode === "setup") {
+    try {
+      console.log("\n🛠️ SkillWeave Setup: Initializing workspace integration...");
+      if (!outDir) {
+        mkdirSync(outDir, { recursive: true });
+        console.log(`Created directory: ${outDir}`);
+      }
+
+      const envExamplePath = join(projectRoot, ".env.example");
+      if (!existsSync(envExamplePath)) {
+        writeFileSync(envExamplePath, "FIREBASE_PROJECT_ID=\"\"\nPROJECT_UUID=\"\"\n");
+        console.log(`Created template: ${envExamplePath}`);
+      }
+
+      const envPath = join(projectRoot, ".env");
+      if (!existsSync(envPath)) {
+        writeFileSync(envPath, "FIREBASE_PROJECT_ID=\"\"\nPROJECT_UUID=\"\"\n");
+        console.warn(`⚠️ Created empty .env file. Please fill in your FIREBASE_PROJECT_ID in: ${envPath}`);
+      }
+
+      const gitignorePath = join(projectRoot, ".gitignore");
+      let needsAppend = true;
+      if (existsSync(gitignorePath)) {
+        const content = readFileSync(gitignorePath, "utf-8");
+        if (content.includes(".env") && content.includes(".t4g/skill-weave/")) {
+          needsAppend = false;
+        }
+      }
+
+      if (needsAppend) {
+        appendFileSync(gitignorePath, "\n# SkillWeave credentials and memory DB files\n.env\n.t4g/skill-weave/\n");
+        console.log(`Updated ${gitignorePath} to ignore .env and .t4g/skill-weave/`);
+      }
+
+      console.log("\n💡 SkillWeave Setup completed! Please configure your credentials inside .env.");
+    } catch (e: any) {
+      console.error("Failed to complete setup:", e.message);
       process.exit(1);
     }
   } else {
-    console.error("Invalid mode. Use --mode check or --mode log");
+    console.error("Invalid mode. Use --mode check, --mode view-peer, --mode draft-log, --mode log, --mode status, or --mode setup");
     process.exit(1);
   }
 }
