@@ -752,6 +752,67 @@ ${dialogueMock}
       console.error("Failed to query database status:", e.message);
       process.exit(1);
     }
+  } else if (mode === "validate-stuck") {
+    const transcriptPath = values["transcript"];
+    if (!transcriptPath || !existsSync(transcriptPath)) {
+      console.error("Please provide a valid --transcript path to validate stuck trigger.");
+      process.exit(1);
+    }
+
+    try {
+      const content = readFileSync(transcriptPath, "utf-8");
+      const lines = content.split("\n");
+      const entries = [];
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          const entry = JSON.parse(line);
+          if (entry.type === "USER_INPUT" && (entry.content || "").trim().toLowerCase().startsWith("/stuck")) {
+            continue;
+          }
+          entries.push(entry);
+        } catch (e) {}
+      }
+
+      const lastEntries = entries.slice(-4);
+      let foundStruggle = false;
+
+      for (const entry of lastEntries) {
+        if (entry.type === "ERROR_MESSAGE") {
+          foundStruggle = true;
+          break;
+        }
+        if (entry.tool_calls) {
+          for (const call of entry.tool_calls) {
+            if (call.output && (call.output.toLowerCase().includes("error") || call.output.toLowerCase().includes("fail"))) {
+              foundStruggle = true;
+              break;
+            }
+          }
+          if (foundStruggle) break;
+        }
+        if (entry.type === "USER_INPUT") {
+          const text = (entry.content || "").toLowerCase();
+          const keywords = ["fail", "error", "stuck", "bug", "wrong", "not working", "broken", "timed out", "crash", "refuse"];
+          if (keywords.some(kw => text.includes(kw))) {
+            foundStruggle = true;
+            break;
+          }
+        }
+      }
+
+      if (foundStruggle) {
+        console.log("Struggle detected: valid");
+        process.exit(0);
+      } else {
+        console.log("No struggle detected: invalid");
+        process.exit(1);
+      }
+    } catch (e: any) {
+      console.error("Failed to run validation check:", e.message);
+      process.exit(1);
+    }
   } else if (mode === "setup") {
     try {
       console.log("\n🛠️ SkillWeave Setup: Initializing workspace integration...");

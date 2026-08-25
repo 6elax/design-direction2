@@ -63,6 +63,18 @@ I have successfully updated all relevant files in the `docs-plans/protostudy-2/`
     *   `skillweave-setup-usage-guide.md` (renamed setup instructions guide mapping out Firestore credentials config, seeding scripts, and trigger hook commands)
     *   `skills/plugins-in-progress/agent-learning/rules/GEMINI.md` (added automatic trigger rules hook so they deploy directly when users run `bun run setup` globally)
 
+### 8. Validation Gating Enforcement
+*   **Modified**: [`skill-weave-agent.ts`](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/scripts/skill-weave-agent.ts)
+    *   Implemented `--mode validate-stuck` to run a diagnostic check on the recent transcript history.
+    *   Checks the preceding 4 conversation turns for compilation error blocks or friction keywords. Exits code `0` (allow) if found, or code `1` (block) if the dialogue context is clean.
+*   **Modified**: [`rules.md`](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/rules.md)
+    *   Updated the `/stuck` rule to run the validation check and display the pushback message if blocked.
+    *   Updated the `/resolved` rule to verify if the struggle block has at least 2 exchanges before drafting, printing the cancellation warning if trivial.
+*   **Synced**: [`GEMINI.md`](file:///Users/alexisluo/tech4good/skills/plugins-in-progress/agent-learning/rules/GEMINI.md) in the `skills` repository to distribute these validation check rules globally.
+*   **Verification**:
+    *   Executed validation checks against a clean transcript: exited with code `1` (`No struggle detected: invalid`).
+    *   Executed validation checks against an error transcript: exited with code `0` (`Struggle detected: valid`).
+
 ---
 
 ## Verification Results
