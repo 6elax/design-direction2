@@ -266,7 +266,7 @@ async function main() {
     const matches = [];
 
     for (const struggle of struggles) {
-      const textToMatch = `${struggle.key} ${struggle.roadblock || struggle.insight || ""} ${struggle.resolution || ""}`.toLowerCase();
+      const textToMatch = `${struggle.key} ${struggle.summary || ""} ${struggle.roadblock || struggle.insight || ""} ${struggle.resolution || ""}`.toLowerCase();
       let overlapCount = 0;
       for (const keyword of queryKeywords) {
         if (textToMatch.includes(keyword)) {
@@ -289,6 +289,7 @@ async function main() {
         console.log(`------------------------------------------------------------`);
         console.log(`📌 Case ${j + 1} (ID: ${match.id}): [${match.type}] [${match.key}]`);
         console.log(`- Author: ${match.author}`);
+        console.log(`- Summary: ${match.summary || "No generalized summary logged."}`);
         console.log(`- Roadblock: ${match.roadblock || match.insight}`);
         console.log(`Run '/stuck' or '/search' in the chat to dynamically generate Socratic questions comparing your code to this peer log.`);
         console.log(`------------------------------------------------------------`);
@@ -309,27 +310,86 @@ async function main() {
       const doc = await response.json() as any;
       const match = fromFirestoreDocument(doc);
 
+      // Fetch dynamic dialogue snippet using phase index & message index boundaries from the chats collection
+      let dynamicDialogue = "Dialogue history not linked.";
+      const conversationId = match.conversation_id;
+      const pIdx = match.phase_index;
+      const startIdx = match.start_message_index;
+      const endIdx = match.end_message_index;
+
+      if (conversationId && conversationId !== "00000000-0000-0000-0000-000000000000" && pIdx !== undefined && startIdx !== undefined && endIdx !== undefined) {
+        try {
+          const chatResponse = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/chats/${conversationId}`);
+          if (chatResponse.ok) {
+            const chatDoc = await chatResponse.json() as any;
+            const phases = chatDoc.fields?.phases?.arrayValue?.values || [];
+            if (pIdx < phases.length) {
+              const phase = phases[pIdx].mapValue?.fields;
+              const messages = phase.messages?.arrayValue?.values || [];
+              const sliceStart = Math.max(0, startIdx);
+              const sliceEnd = Math.min(messages.length - 1, endIdx);
+              
+              const lines = [];
+              for (let idx = sliceStart; idx <= sliceEnd; idx++) {
+                const msg = messages[idx].mapValue?.fields;
+                const sender = msg.sender?.stringValue || "Unknown";
+                const content = msg.content?.stringValue || "";
+                
+                if (sender.toLowerCase() === "user") {
+                  lines.push(`**User**: ${content}`);
+                } else {
+                  lines.push(`> **Agent**: ${content}`);
+                }
+              }
+              if (lines.length > 0) {
+                dynamicDialogue = lines.join("\n\n");
+              }
+            }
+          }
+        } catch (e: any) {
+          dynamicDialogue = `Failed to retrieve dynamic dialogue snippet: ${e.message}`;
+        }
+      }
+
       if (!existsSync(outDir)) {
         mkdirSync(outDir, { recursive: true });
       }
 
+      // Templates for default questions depending on struggle type.
+      // These will serve as structured fallbacks. The live active agent will dynamically replace them with 
+      // personalized questions that bridge this peer case to the current user's specific context.
+      let q1 = "How does this peer's resolution apply to the problem you are currently facing?";
+      let q2 = "What are the trade-offs of using this approach in your active project files?";
+
+      if (match.type === "SCOPING") {
+        q1 = "How can you restrict your study boundaries to match your core thesis?";
+        q2 = "What features in your current plan can be deferred to a later iteration?";
+      } else if (match.type === "DESIGN-FRICTION") {
+        q1 = "How can you mitigate surveillance anxiety or compliance gaming for your user flows?";
+        q2 = "Does this peer's design balance safety against flexibility effectively?";
+      }
+
       const paneContent = `# [SkillWeave Workspace Pane]
 -------------------------------------------------------------
-* **Author**: ${match.author}
-* **Target Goal/Key**: ${match.key}
-* **Date Logged**: ${match.created_at || new Date().toISOString()}
-
----
 
 ## 📝 Peer Roadblock & Summary
+**Summary**: ${match.summary || "No generalized summary logged."}
+
 **Roadblock**: ${match.roadblock || match.insight || "No summary provided."}
 
 **Resolution**: ${match.resolution || "No resolution details logged."}
 
 ---
 
+## 💡 Socratic Pivot Questions
+<!-- AGENT_INJECTION: Please replace these with 2 custom Socratic pivot questions that bridge the peer roadblock/resolution with the current user's specific struggle/difficulty context. -->
+1. ${q1}
+2. ${q2}
+
+---
+
 ## 🎙️ Verbatim Dialogue History
-${match.dialogue_history || "No dialogue history logged."}
+${dynamicDialogue}
 `;
 
       const outPath = join(outDir, "peer_workspace_case_study.md");
@@ -392,19 +452,19 @@ ${match.dialogue_history || "No dialogue history logged."}
       for (const entry of targetEntries) {
         if (entry.type === "USER_INPUT") {
           roadblockText = entry.content || roadblockText;
-          formattedLines.push(`> **User**: ${entry.content}`);
+          formattedLines.push(`**User**: ${entry.content}`);
         } else if (entry.type === "PLANNER_RESPONSE") {
           formattedLines.push(`> **Agent**: ${entry.content || "Responding..."}`);
         }
       }
 
       if (formattedLines.length > 0) {
-        dialogueMock = formattedLines.join("\n>\n>");
+        dialogueMock = formattedLines.join("\n\n");
       }
     } catch (e) {}
 
     if (!dialogueMock) {
-      dialogueMock = `> **User**: Why does the helper agent only trigger on coding files?\n>\n> **Agent**: The current telemetry watchers only listen to code changes.\n>\n> **User**: We need to expand this. Non-developers should be able to use SkillWeave for planning and design tasks too.`;
+      dialogueMock = `**User**: Why does the helper agent only trigger on coding files?\n\n> **Agent**: The current telemetry watchers only listen to code changes.\n\n**User**: We need to expand this. Non-developers should be able to use SkillWeave for planning and design tasks too.`;
     }
 
     if (!existsSync(outDir)) {
@@ -415,6 +475,9 @@ ${match.dialogue_history || "No dialogue history logged."}
     const author = "Alexis";
     const initialKey = formatStruggleKey(author, `struggle-${Date.now()}`);
     const conversationId = await findMatchingChatId(author, initialKey, "TECHNICAL", transcriptText);
+    
+    // Pre-written generalized summary by the agent ending in exactly 1 general Socratic question on a new line
+    const summaryText = "Faced a bottleneck while trying to configure project settings, and resolved it by replacing hardcoded paths with a dynamic variable parameter to make configuration checks flexible.\\n\\nHow can you parameterize your environment configurations to support multiple runtime settings?";
 
     const reviewContent = `# [SkillWeave: Review Your Resolved Struggle]
 -------------------------------------------------------------
@@ -422,11 +485,16 @@ ${match.dialogue_history || "No dialogue history logged."}
 * **Type**: TECHNICAL
 * **Key**: ${initialKey}
 * **Conversation ID**: ${conversationId}
+* **Phase Index**: 0
+* **Start Message Index**: 3
+* **End Message Index**: 5
 * **Status**: Pending Approval (Review and commit to cohort database)
 
 ---
 
 ## 📝 AI-Generated Struggle Summary
+**Summary**: ${summaryText}
+
 **Roadblock**: ${roadblockText}
 
 **Resolution**: ${resolutionText}
@@ -467,18 +535,24 @@ ${dialogueMock}
       const typeMatch = content.match(/\*\s*\*\*Type\*\*:\s*(.*)/i);
       const keyMatch = content.match(/\*\s*\*\*Key\*\*:\s*(.*)/i);
       const convMatch = content.match(/\*\s*\*\*Conversation ID\*\*:\s*(.*)/i);
+      const phaseMatch = content.match(/\*\s*\*\*Phase Index\*\*:\s*(.*)/i);
+      const startMatch = content.match(/\*\s*\*\*Start Message Index\*\*:\s*(.*)/i);
+      const endMatch = content.match(/\*\s*\*\*End Message Index\*\*:\s*(.*)/i);
       
       const author = authorMatch ? authorMatch[1].trim() : "Unknown";
       const type = typeMatch ? typeMatch[1].trim() : "TECHNICAL";
       const rawKey = keyMatch ? keyMatch[1].trim() : `struggle-${Date.now()}`;
       const conversationId = convMatch ? convMatch[1].trim() : "00000000-0000-0000-0000-000000000000";
+      const phaseIndex = phaseMatch ? Number(phaseMatch[1].trim()) : 0;
+      const startMsgIndex = startMatch ? Number(startMatch[1].trim()) : 0;
+      const endMsgIndex = endMatch ? Number(endMatch[1].trim()) : 0;
       
       const key = formatStruggleKey(author, rawKey);
 
       const sections = content.split(/## /);
+      let summary = "";
       let roadblock = "";
       let resolution = "";
-      let dialogue_history = "";
       
       for (const section of sections) {
         const lines = section.split("\n");
@@ -496,10 +570,12 @@ ${dialogueMock}
             .join("\n")
             .trim();
           
+          const genSummaryMatch = summaryStr.match(/\*\*Summary\*\*:\s*([\s\S]*?)(?=\*\*Roadblock\*\*|$)/i);
           const roadblockMatch = summaryStr.match(/\*\*Roadblock\*\*:\s*([\s\S]*?)(?=\*\*Resolution\*\*|$)/i);
           const resolutionMatch = summaryStr.match(/\*\*Resolution\*\*:\s*([\s\S]*?)$/i);
           
-          roadblock = roadblockMatch ? roadblockMatch[1].trim() : summaryStr;
+          summary = genSummaryMatch ? genSummaryMatch[1].trim() : "";
+          roadblock = roadblockMatch ? roadblockMatch[1].trim() : (genSummaryMatch ? summaryStr.replace(genSummaryMatch[0], "").trim() : summaryStr);
           resolution = resolutionMatch ? resolutionMatch[1].trim() : "";
         } else if (heading.includes("Diffs") || heading.includes("Resolution")) {
           const codeBlockMatch = cleanBody.match(/```diff([\s\S]*?)```/);
@@ -507,12 +583,6 @@ ${dialogueMock}
           if (!resolution) {
             resolution = rawRes;
           }
-        } else if (heading.includes("Dialogue") || heading.includes("History")) {
-          const dialogLines = bodyLines
-            .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:"))
-            .join("\n")
-            .trim();
-          dialogue_history = dialogLines;
         }
       }
       
@@ -531,11 +601,14 @@ ${dialogueMock}
           project_uuid: projectUuid,
           type: upperType,
           key,
+          summary: summary || null,
           roadblock,
           resolution: resolution || null,
           conversation_id: conversationId,
+          phase_index: phaseIndex,
+          start_message_index: startMsgIndex,
+          end_message_index: endMsgIndex,
           author,
-          dialogue_history: dialogue_history || null,
           created_at: new Date().toISOString()
         });
 
@@ -572,7 +645,7 @@ ${dialogueMock}
 
       try {
         const payload = JSON.parse(payloadStr);
-        const { type, key: rawKey, insight, roadblock: payRoadblock, resolution, example, "conversation-id": conversationId, author, dialogue_history } = payload;
+        const { type, key: rawKey, summary, insight, roadblock: payRoadblock, resolution, example, "conversation-id": conversationId, author, phase_index, start_message_index, end_message_index } = payload;
 
         if (!type || !rawKey || !(insight || payRoadblock) || !conversationId || !author) {
           throw new Error("Missing required fields: type, key, roadblock/insight, conversation-id, author");
@@ -591,11 +664,14 @@ ${dialogueMock}
           project_uuid: projectUuid,
           type: upperType,
           key,
+          summary: summary || null,
           roadblock: payRoadblock || insight,
           resolution: resolution || example || null,
           conversation_id: conversationId,
+          phase_index: phase_index !== undefined ? Number(phase_index) : 0,
+          start_message_index: start_message_index !== undefined ? Number(start_message_index) : 0,
+          end_message_index: end_message_index !== undefined ? Number(end_message_index) : 0,
           author,
-          dialogue_history: dialogue_history || null,
           created_at: new Date().toISOString()
         });
 

@@ -32,21 +32,13 @@ If the user clicks `[🔍 Open Peer Workspace Pane]` or types "yes" in the chat,
 ```markdown
 # [SkillWeave Workspace Pane]
 -------------------------------------------------------------
-* **Project**: SmartScheduler | **Author**: User 1
-* **Target Goal**: Secure Firestore collections using custom claims.
-
----
 
 ## 📝 Peer Roadblock & Summary
+**Summary**: Faced a mismatch between auth.uid check logic and custom admin claims, and resolved this by checking request.auth.token.admin == true instead of standard uid matches.
+
 **Roadblock**: The cohort member realized that Firestore rule auth.uid does not verify admin custom claims automatically.
 
 **Resolution**: They resolved this by querying request.auth.token.admin == true. If your team does not use admin roles, evaluate if resource-owner gating fits your collections better.
-
----
-
-## 💡 Socratic Pivot Questions
-1. User 1 gated resources using custom admin claims. Does your collection require administrative hierarchy, or is simple owner-only gating sufficient?
-2. What are the security trade-offs of checking custom claims on every query?
 
 ---
 
@@ -59,11 +51,11 @@ If the user clicks `[🔍 Open Peer Workspace Pane]` or types "yes" in the chat,
 ---
 
 ## 🎙️ Verbatim Dialogue History
-> **User**: Why does the security rule auth.uid fail for my admin role checks?
->
+**User**: Why does the security rule auth.uid fail for my admin role checks?
+
 > **Agent**: The auth.uid check only checks the uid string match. Custom claims are nested inside request.auth.token.
->
-> **User**: Oh I see, I should check token.admin instead.
+
+**User**: Oh I see, I should check token.admin instead.
 ```
 
 ### Level 3: Helpfulness Feedback (Native Multiple-Choice Question)

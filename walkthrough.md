@@ -38,20 +38,30 @@ I have successfully updated all relevant files in the `docs-plans/protostudy-2/`
 ### 5. Layout Mockups & Evolution Logs
 *   **Modified**: [`peer-workspace-pane.md`](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/protostudy-2/peer-workspace-pane.md)
     *   Removed the obsolete "Peer Reflection" and "Workspace Materials" sections, and deleted the non-functional search box mockup.
-    *   Added **Peer Roadblock & Summary** (split into distinct **Roadblock** and **Resolution** bold paragraphs) and **Verbatim Dialogue History** sections (formatted with blank lines between turns) to render actual conversation logs.
+    *   Removed metadata headers (author, key, date) from the top of the file to simplify layout.
+    *   Added **Peer Roadblock & Summary** (split into roadblock and resolution paragraphs) and **Verbatim Dialogue History** sections.
+    *   Formatted dialogue history so user turns are plain text and agent turns are blockquotes (`>` prefixed), with blank lines between turns.
 *   **NEW**: [`pending-struggle-log.md`](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/protostudy-2/pending-struggle-log.md)
-    *   Created a mockup showing exactly how the dynamic `pending_struggle_log.md` review card will render in the right-side Artifacts panel, structuring the struggle summary into separate Roadblock/Resolution paragraphs, formatting dialogue history with blank lines, and correcting the tip to explain comment-based review and clicking **Proceed** (no command line commits).
+    *   Created a mockup showing the dynamic `pending_struggle_log.md` review card, structuring summary into separate Roadblock/Resolution paragraphs, formatting dialogue history (spaced turns, user turns as plain text, agent turns with `>` sidebar), and correcting the tip.
 *   **Modified**: [`protostudy-2-evolution.md`](file:///Users/alexisluo/tech4good/design-dir-2/docs-plans/protostudy-2/protostudy-2-evolution.md)
     *   Recorded Cycle 2 planning decisions, scope refinements, and timeline scaling adjustments.
 
 ### 6. Modified Prototype Script & Skill Rules
 *   **Modified**: [`skill-weave-agent.ts`](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/scripts/skill-weave-agent.ts)
-    *   Added `--mode view-peer` to generate `.t4g/skill-weave/peer_workspace_case_study.md` on the right side, rendering the **Peer Roadblock & Summary** (separate roadblock and resolution paragraphs) and **Verbatim Dialogue History** (blank lines between turns) sections.
-    *   Added `--mode draft-log` to generate `.t4g/skill-weave/pending_struggle_log.md` inside a hidden, gitignored `.t4g/skill-weave/` folder with updated instructions (commenting/Proceed), divided paragraphs, and resolved `conversation_id` referencing the `chats` collection.
+    *   Added `--mode view-peer` to generate `.t4g/skill-weave/peer_workspace_case_study.md` on the right side, rendering **Peer Roadblock & Summary** (separate roadblock and resolution paragraphs) and **Verbatim Dialogue History** (blank lines between turns, user turns as regular text, agent turns with blockquote sidebars). Removed the metadata headers.
+    *   Added `--mode draft-log` to generate `.t4g/skill-weave/pending_struggle_log.md` inside a hidden, gitignored `.t4g/skill-weave/` folder with updated instructions (commenting/Proceed), divided paragraphs, and dialogue formatting.
     *   Updated `--mode log` to accept `--file` parameter which reads the saved review card file, parses out user comments, extracts the Roadblock/Resolution summaries and verbatim dialogue history, and commits them to Firebase Firestore.
 *   **Modified**: [`SKILL.md`](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/SKILL.md) & [`rules.md`](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/rules.md)
-    *   Updated the progressive disclosure layout and review gating instructions to match the Antigravity 2.0-native flow (Roadblock & Summary split, Verbatim Dialogue History with blank lines, comments for editing, Multiple-Choice rating via `ask_question` widget, and Proceed button).
-*   **Database Updated**: Migrated database backend from Supabase to Firebase Firestore struggles collection, using dynamic lookup links to reference parent chat session documents in the chats collection. Deleted obsolete `schema.sql`.
+    *   Updated progressive disclosure layout and review gating instructions.
+*   **Database Updated**: Migrated database backend to Firebase Firestore struggles collection, using dynamic lookup links to reference parent chat session documents.
+*   **Directory Cleanup**: Purged temporary `.agents/` folder to align with the core `skills` repository installation structure (retaining only the standard project `skill-weave/` folder).
+
+### 7. Core Skills Repository Synchronization
+*   **Synced Files**: Copied all updated files from `skill-weave/` folder to `skills/plugins-in-progress/agent-learning/skills/skillweave/`:
+    *   `skill-weave-agent.ts` (script with Firestore bindings, roadblock/resolution summaries, dialogue line spacing, and metadata removals)
+    *   `SKILL.md` (progressive disclosure layouts and pane templates matching the new format)
+    *   `skillweave-setup-usage-guide.md` (renamed setup instructions guide mapping out Firestore credentials config, seeding scripts, and trigger hook commands)
+    *   `skills/plugins-in-progress/agent-learning/rules/GEMINI.md` (added automatic trigger rules hook so they deploy directly when users run `bun run setup` globally)
 
 ---
 
