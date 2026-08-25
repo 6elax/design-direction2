@@ -340,6 +340,20 @@ async function findDialogueIndices(chatId: string, roadblock: string, resolution
   return fallback;
 }
 
+// Generate local ISO string with PST/PDT offset
+function getLocalISOString(): string {
+  const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+  const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+  
+  const offset = (new Date()).getTimezoneOffset();
+  const sign = offset > 0 ? "-" : "+";
+  const absOffset = Math.abs(offset);
+  const hours = String(Math.floor(absOffset / 60)).padStart(2, "0");
+  const minutes = String(absOffset % 60).padStart(2, "0");
+  
+  return `${localISOTime}${sign}${hours}:${minutes}`;
+}
+
 async function seed() {
   console.log(`Seeding ${CASES.length} historical case studies into Firebase Firestore struggles collection...\n`);
   
@@ -372,7 +386,7 @@ async function seed() {
         phase_index: indices.phase_index,
         start_message_index: indices.start_message_index,
         end_message_index: indices.end_message_index,
-        created_at: new Date().toISOString()
+        created_at: getLocalISOString()
       });
 
       const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles/${key}`, {

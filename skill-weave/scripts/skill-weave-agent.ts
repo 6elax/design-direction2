@@ -57,6 +57,20 @@ function getKeywords(text: string): string[] {
     .filter(word => word.length > 2 && !STOP_WORDS.has(word));
 }
 
+// Generate local ISO string with PST/PDT offset
+function getLocalISOString(): string {
+  const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+  const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+  
+  const offset = (new Date()).getTimezoneOffset();
+  const sign = offset > 0 ? "-" : "+";
+  const absOffset = Math.abs(offset);
+  const hours = String(Math.floor(absOffset / 60)).padStart(2, "0");
+  const minutes = String(absOffset % 60).padStart(2, "0");
+  
+  return `${localISOTime}${sign}${hours}:${minutes}`;
+}
+
 // Firestore REST Serialization Helpers
 function toFirestoreValue(value: any): any {
   if (value === null || value === undefined) {
@@ -482,6 +496,7 @@ ${dynamicDialogue}
     const reviewContent = `# [SkillWeave: Review Your Resolved Struggle]
 -------------------------------------------------------------
 * **Author**: ${author}
+* **Created At**: ${getLocalISOString()}
 * **Type**: TECHNICAL
 * **Key**: ${initialKey}
 * **Conversation ID**: ${conversationId}
@@ -609,7 +624,7 @@ ${dialogueMock}
           start_message_index: startMsgIndex,
           end_message_index: endMsgIndex,
           author,
-          created_at: new Date().toISOString()
+          created_at: getLocalISOString()
         });
 
         const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles/${key}`, {
@@ -672,7 +687,7 @@ ${dialogueMock}
           start_message_index: start_message_index !== undefined ? Number(start_message_index) : 0,
           end_message_index: end_message_index !== undefined ? Number(end_message_index) : 0,
           author,
-          created_at: new Date().toISOString()
+          created_at: getLocalISOString()
         });
 
         const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/struggles/${key}`, {
