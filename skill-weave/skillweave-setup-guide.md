@@ -16,8 +16,8 @@ SkillWeave runs as a background chat skill agent (similar to the `agent-reflecti
 
 ### Step 1: Clone or Copy Skill Assets
 Ensure the following files are copied into your repository's configuration directory:
-1.  **Skill Description:** Place [SKILL.md](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/SKILL.md) in your workspace `skill-weave/` directory.
-2.  **Runner Controller:** Place the runner script at [skill-weave/scripts/skill-weave-agent.ts](file:///Users/alexisluo/tech4good/design-dir-2/skill-weave/scripts/skill-weave-agent.ts).
+1.  **Skill Description:** Place `SKILL.md` in your workspace `skill-weave/` directory.
+2.  **Runner Controller:** Place the runner script at `skill-weave/scripts/skill-weave-agent.ts`.
 
 ---
 
