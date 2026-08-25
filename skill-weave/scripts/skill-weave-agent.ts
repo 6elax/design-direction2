@@ -490,6 +490,90 @@ ${dynamicDialogue}
     const initialKey = formatStruggleKey(author, `struggle-${Date.now()}`);
     const conversationId = await findMatchingChatId(author, initialKey, "TECHNICAL", transcriptText);
     
+    // Dynamically search the Firestore chat log phases and messages to find the exact matching range
+    let phaseIndex = 0;
+    let startMsgIndex = 0;
+    let endMsgIndex = 0;
+
+    if (conversationId && conversationId !== "00000000-0000-0000-0000-000000000000") {
+      try {
+        const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/chats/${conversationId}`);
+        if (response.ok) {
+          const doc = await response.json() as any;
+          const phases = doc.fields?.phases?.arrayValue?.values || [];
+          
+          // Clean search texts from local transcript roadblock/resolution
+          const cleanRoadblock = roadblockText.toLowerCase().replace(/[^\w]/g, "");
+          
+          let bestPhase = 0;
+          let bestStart = 0;
+          let bestEnd = 0;
+          let maxStartScore = -1;
+          let maxEndScore = -1;
+          
+          for (let p = 0; p < phases.length; p++) {
+            const phase = phases[p].mapValue?.fields;
+            const messages = phase.messages?.arrayValue?.values || [];
+            for (let m = 0; m < messages.length; m++) {
+              const content = (messages[m].mapValue?.fields?.content?.stringValue || "").toLowerCase().replace(/[^\w]/g, "");
+              if (!content) continue;
+              
+              let matchScore = 0;
+              if (content.includes(cleanRoadblock) || cleanRoadblock.includes(content)) {
+                matchScore = 100;
+              } else {
+                // keyword fallback
+                const words = cleanRoadblock.split(/\s+/).filter(w => w.length > 3);
+                for (const w of words) {
+                  if (w && content.includes(w)) matchScore++;
+                }
+              }
+              
+              if (matchScore > maxStartScore) {
+                maxStartScore = matchScore;
+                bestPhase = p;
+                bestStart = m;
+              }
+            }
+          }
+          
+          // For the end message index, we find a message in the same phase that matches the resolution
+          if (phases[bestPhase]) {
+            const phase = phases[bestPhase].mapValue?.fields;
+            const messages = phase.messages?.arrayValue?.values || [];
+            const cleanResolution = resolutionText.toLowerCase().replace(/[^\w]/g, "");
+            
+            for (let m = bestStart; m < messages.length; m++) {
+              const content = (messages[m].mapValue?.fields?.content?.stringValue || "").toLowerCase().replace(/[^\w]/g, "");
+              if (!content) continue;
+              
+              let matchScore = 0;
+              if (content.includes(cleanResolution) || cleanResolution.includes(content)) {
+                matchScore = 100;
+              } else {
+                const words = cleanResolution.split(/\s+/).filter(w => w.length > 3);
+                for (const w of words) {
+                  if (w && content.includes(w)) matchScore++;
+                }
+              }
+              
+              if (matchScore > maxEndScore) {
+                maxEndScore = matchScore;
+                bestEnd = m;
+              }
+            }
+          }
+          
+          phaseIndex = bestPhase;
+          // Set window starting 1 turn before roadblock and ending 1 turn after resolution to capture full context
+          startMsgIndex = Math.max(0, bestStart - 1);
+          endMsgIndex = Math.min((phases[bestPhase]?.mapValue?.fields?.messages?.arrayValue?.values?.length || 1) - 1, bestEnd + 1);
+        }
+      } catch (e) {
+        console.warn("Could not dynamically resolve active indices from chats collection:", e);
+      }
+    }
+
     // Pre-written generalized summary by the agent ending in exactly 1 general Socratic question on a new line
     const summaryText = "Faced a bottleneck while trying to configure project settings, and resolved it by replacing hardcoded paths with a dynamic variable parameter to make configuration checks flexible.\\n\\nHow can you parameterize your environment configurations to support multiple runtime settings?";
 
@@ -500,9 +584,9 @@ ${dynamicDialogue}
 * **Type**: TECHNICAL
 * **Key**: ${initialKey}
 * **Conversation ID**: ${conversationId}
-* **Phase Index**: 0
-* **Start Message Index**: 3
-* **End Message Index**: 5
+* **Phase Index**: ${phaseIndex}
+* **Start Message Index**: ${startMsgIndex}
+* **End Message Index**: ${endMsgIndex}
 * **Status**: Pending Approval (Review and commit to cohort database)
 
 ---
@@ -750,67 +834,6 @@ ${dialogueMock}
       console.log("-----------------------------------------");
     } catch (e: any) {
       console.error("Failed to query database status:", e.message);
-      process.exit(1);
-    }
-  } else if (mode === "validate-stuck") {
-    const transcriptPath = values["transcript"];
-    if (!transcriptPath || !existsSync(transcriptPath)) {
-      console.error("Please provide a valid --transcript path to validate stuck trigger.");
-      process.exit(1);
-    }
-
-    try {
-      const content = readFileSync(transcriptPath, "utf-8");
-      const lines = content.split("\n");
-      const entries = [];
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        try {
-          const entry = JSON.parse(line);
-          if (entry.type === "USER_INPUT" && (entry.content || "").trim().toLowerCase().startsWith("/stuck")) {
-            continue;
-          }
-          entries.push(entry);
-        } catch (e) {}
-      }
-
-      const lastEntries = entries.slice(-4);
-      let foundStruggle = false;
-
-      for (const entry of lastEntries) {
-        if (entry.type === "ERROR_MESSAGE") {
-          foundStruggle = true;
-          break;
-        }
-        if (entry.tool_calls) {
-          for (const call of entry.tool_calls) {
-            if (call.output && (call.output.toLowerCase().includes("error") || call.output.toLowerCase().includes("fail"))) {
-              foundStruggle = true;
-              break;
-            }
-          }
-          if (foundStruggle) break;
-        }
-        if (entry.type === "USER_INPUT") {
-          const text = (entry.content || "").toLowerCase();
-          const keywords = ["fail", "error", "stuck", "bug", "wrong", "not working", "broken", "timed out", "crash", "refuse"];
-          if (keywords.some(kw => text.includes(kw))) {
-            foundStruggle = true;
-            break;
-          }
-        }
-      }
-
-      if (foundStruggle) {
-        console.log("Struggle detected: valid");
-        process.exit(0);
-      } else {
-        console.log("No struggle detected: invalid");
-        process.exit(1);
-      }
-    } catch (e: any) {
-      console.error("Failed to run validation check:", e.message);
       process.exit(1);
     }
   } else if (mode === "setup") {
