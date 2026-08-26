@@ -180,6 +180,143 @@ export async function findMatchingChatId(author: string, key: string, type: stri
   return "00000000-0000-0000-0000-000000000000";
 }
 
+export async function syncChatToFirestore(conversationId: string, author: string, key: string, type: string, dialogueHistory: string) {
+  if (!conversationId || conversationId === "00000000-0000-0000-0000-000000000000" || !dialogueHistory) {
+    return;
+  }
+
+  try {
+    const lines = dialogueHistory.split("\n");
+    const parsedMessages = [];
+    let currentSender = "";
+    let currentContentLines = [];
+
+    for (const line of lines) {
+      const cleanLine = line.trim();
+      const userMatch = cleanLine.match(/^(?:\*\*User\*\*|\*\*user\*\*):\s*(.*)/i);
+      const agentMatch = cleanLine.match(/^(?:>\s*\*\*Agent\*\*|>\s*\*\*agent\*\*|\*\*Agent\*\*|\*\*agent\*\*):\s*(.*)/i);
+
+      if (userMatch) {
+        if (currentSender && currentContentLines.length > 0) {
+          parsedMessages.push({ sender: currentSender, content: currentContentLines.join("\n").trim() });
+        }
+        currentSender = "User";
+        currentContentLines = [userMatch[1]];
+      } else if (agentMatch) {
+        if (currentSender && currentContentLines.length > 0) {
+          parsedMessages.push({ sender: currentSender, content: currentContentLines.join("\n").trim() });
+        }
+        currentSender = "Agent";
+        currentContentLines = [agentMatch[1]];
+      } else {
+        if (currentSender) {
+          let contentLine = line; // Preserve raw spaces/tabs
+          if (currentSender === "Agent" && contentLine.trim().startsWith(">")) {
+            const trimmed = contentLine.trim();
+            contentLine = trimmed.slice(1);
+            if (contentLine.startsWith(" ")) {
+              contentLine = contentLine.slice(1);
+            }
+          }
+          currentContentLines.push(contentLine);
+        }
+      }
+    }
+
+    if (currentSender && currentContentLines.length > 0) {
+      parsedMessages.push({ sender: currentSender, content: currentContentLines.join("\n").trim() });
+    }
+
+    if (parsedMessages.length === 0) return;
+
+    let topic = "product";
+    const keyLower = key.toLowerCase();
+    const typeLower = type.toLowerCase();
+    if (keyLower.includes("validation") || keyLower.includes("hypothesis") || keyLower.includes("study") || typeLower.includes("validation")) {
+      topic = "validation";
+    } else if (keyLower.includes("literature") || keyLower.includes("research") || keyLower.includes("thesis")) {
+      topic = "research";
+    }
+
+    // Fetch existing chats document to merge phases and evolution
+    let existingPhases = [];
+    let existingEvolution = [];
+    const chatUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/chats/${conversationId}`;
+    try {
+      const fetchRes = await fetch(chatUrl);
+      if (fetchRes.ok) {
+        const existingDoc = await fetchRes.json() as any;
+        existingPhases = existingDoc.fields?.phases?.arrayValue?.values || [];
+        existingEvolution = existingDoc.fields?.evolution?.arrayValue?.values || [];
+      }
+    } catch (e) {}
+
+    // Construct new phase map
+    const newPhaseValue = {
+      mapValue: {
+        fields: {
+          title: { stringValue: `Struggle: ${key}` },
+          messages: {
+            arrayValue: {
+              values: parsedMessages.map(msg => ({
+                mapValue: {
+                  fields: {
+                    sender: { stringValue: msg.sender },
+                    content: { stringValue: msg.content }
+                  }
+                }
+              }))
+            }
+          }
+        }
+      }
+    };
+
+    // Append new phase to the end
+    const updatedPhases = [...existingPhases, newPhaseValue];
+
+    // Construct payload payload including metadata fields: project, topic, user
+    const chatDocPayload: Record<string, any> = {
+      fields: {
+        user: { stringValue: author.toLowerCase() },
+        topic: { stringValue: topic },
+        project: { stringValue: "design-dir-2" },
+        phases: {
+          arrayValue: {
+            values: updatedPhases
+          }
+        }
+      }
+    };
+
+    // Preserve existing evolution if present
+    if (existingEvolution.length > 0) {
+      chatDocPayload.fields.evolution = {
+        arrayValue: {
+          values: existingEvolution
+        }
+      };
+    }
+
+    const response = await fetch(chatUrl, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(chatDocPayload)
+    });
+
+    if (response.ok) {
+      console.log(`Successfully synced dialogue to chats collection document: [${conversationId}]`);
+    } else {
+      const errorText = await response.text();
+      console.warn(`Failed to sync dialogue to chats collection: ${errorText}`);
+    }
+  } catch (e: any) {
+    console.warn(`Error during chats collection sync: ${e.message}`);
+  }
+}
+
 // Ensure .gitignore has .t4g/skill-weave/
 function ensureGitignore() {
   const gitignorePath = join(projectRoot, ".gitignore");
@@ -456,10 +593,10 @@ ${dynamicDialogue}
 
       let targetEntries = [];
       if (endIndex !== -1) {
-        const start = startIndex !== -1 ? Math.max(0, startIndex - 2) : Math.max(0, endIndex - 6);
-        targetEntries = entries.slice(start, endIndex + 1);
+        const start = startIndex !== -1 ? Math.max(0, startIndex - 5) : Math.max(0, endIndex - 10);
+        targetEntries = entries.slice(start, endIndex + 2);
       } else {
-        targetEntries = entries.slice(Math.max(0, entries.length - 6));
+        targetEntries = entries.slice(Math.max(0, entries.length - 12));
       }
 
       const formattedLines = [];
@@ -486,7 +623,7 @@ ${dynamicDialogue}
     }
 
     // Dynamically query chats collection to find correct conversation ID link
-    const author = "Alexis";
+    const author = "alexis";
     const initialKey = formatStruggleKey(author, `struggle-${Date.now()}`);
     const conversationId = await findMatchingChatId(author, initialKey, "TECHNICAL", transcriptText);
     
@@ -565,9 +702,9 @@ ${dynamicDialogue}
           }
           
           phaseIndex = bestPhase;
-          // Set window starting 1 turn before roadblock and ending 1 turn after resolution to capture full context
-          startMsgIndex = Math.max(0, bestStart - 1);
-          endMsgIndex = Math.min((phases[bestPhase]?.mapValue?.fields?.messages?.arrayValue?.values?.length || 1) - 1, bestEnd + 1);
+          // Set window starting 4 turns before roadblock and ending 2 turns after resolution to capture full context
+          startMsgIndex = Math.max(0, bestStart - 4);
+          endMsgIndex = Math.min((phases[bestPhase]?.mapValue?.fields?.messages?.arrayValue?.values?.length || 1) - 1, bestEnd + 2);
         }
       } catch (e) {
         console.warn("Could not dynamically resolve active indices from chats collection:", e);
@@ -638,7 +775,7 @@ ${dialogueMock}
       const startMatch = content.match(/\*\s*\*\*Start Message Index\*\*:\s*(.*)/i);
       const endMatch = content.match(/\*\s*\*\*End Message Index\*\*:\s*(.*)/i);
       
-      const author = authorMatch ? authorMatch[1].trim() : "Unknown";
+      const author = authorMatch ? authorMatch[1].trim().toLowerCase() : "unknown";
       const type = typeMatch ? typeMatch[1].trim() : "TECHNICAL";
       const rawKey = keyMatch ? keyMatch[1].trim() : `struggle-${Date.now()}`;
       const conversationId = convMatch ? convMatch[1].trim() : "00000000-0000-0000-0000-000000000000";
@@ -652,6 +789,7 @@ ${dialogueMock}
       let summary = "";
       let roadblock = "";
       let resolution = "";
+      let dialogue_history = "";
       
       for (const section of sections) {
         const lines = section.split("\n");
@@ -682,6 +820,12 @@ ${dialogueMock}
           if (!resolution) {
             resolution = rawRes;
           }
+        } else if (heading.includes("Dialogue") || heading.includes("History")) {
+          const dialogLines = bodyLines
+            .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:"))
+            .join("\n")
+            .trim();
+          dialogue_history = dialogLines;
         }
       }
       
@@ -727,6 +871,8 @@ ${dialogueMock}
         
         console.log(`Successfully logged SkillWeave struggle from file: [${key}]`);
         
+        await syncChatToFirestore(conversationId, author, key, type, dialogue_history);
+        
         try {
           unlinkSync(filePath);
           console.log(`Cleared local review file: ${filePath}`);
@@ -771,7 +917,7 @@ ${dialogueMock}
           phase_index: phase_index !== undefined ? Number(phase_index) : 0,
           start_message_index: start_message_index !== undefined ? Number(start_message_index) : 0,
           end_message_index: end_message_index !== undefined ? Number(end_message_index) : 0,
-          author,
+          author: author.toLowerCase(),
           created_at: getLocalISOString(),
           dialogue_history: dialogue_history || null
         });
@@ -790,6 +936,8 @@ ${dialogueMock}
         }
 
         console.log(`Successfully logged SkillWeave struggle: [${key}]`);
+        
+        await syncChatToFirestore(conversationId, author, key, type, dialogue_history);
       } catch (e: any) {
         console.error("Failed to log struggle:", e.message);
         process.exit(1);
