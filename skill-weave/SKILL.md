@@ -103,12 +103,47 @@ graph TD
 
 ---
 
+## 💾 Offline Chat History Saving & Firestore Chat Syncing
+
+To maintain user privacy while enabling rich peer learning, conversation history is managed through a hybrid offline-to-cloud lifecycle:
+
+### 1. Privacy-First Local Tracking
+All conversational turns and telemetry watches operate strictly **offline/locally** inside the user's local Antigravity session storage. No raw chat logs are streamed or uploaded to the cloud during active development.
+
+### 2. Transcript Extraction (`/save-chat-transcript`)
+When the user types `/resolved`, the agent triggers the `/save-chat-transcript` skill to read the local session transcript, filter out noise (such as status updates or compiler outputs), and isolate the dialogue turns relevant to the struggle.
+
+### 3. Dual-Collection Firestore Sync
+When the user approves the review card by clicking **Proceed**, the agent commits the verified struggle across two synchronized Firestore collections:
+
+1. **`struggles/{key}` Collection**:
+   * `key`: Formatted struggle slug (`author-description`).
+   * `author`: Lowercase user account name (detected cross-platform via OS username / environment).
+   * `summary`: The plain-English summary paragraph and concluding Socratic question.
+   * `roadblock`: The core obstacle encountered.
+   * `resolution`: How the roadblock was overcome.
+   * `dialogue_history`: Verbatim alternating user/agent conversation turns.
+   * `conversation_id`: Unique ID linking to the parent chat document.
+   * `phase_index`: 0-based index of the struggle phase within the chat document.
+   * `start_message_index` & `end_message_index`: Exact boundary indices of the struggle exchange.
+
+2. **`chats/{conversation_id}` Collection**:
+   * `user`: Lowercase account username (**guaranteed equal to `author` in `struggles`**).
+   * `project`: Dynamic project repository name.
+   * `topic`: High-level domain area (e.g. `product`, `research`, `engineering`).
+   * `phases`: Array of phase objects containing `title` (`Struggle: <key>`) and `messages` (array of `{ sender, content }`).
+   * `evolution`: Array of milestone snapshots (preserved across syncs).
+
+---
+
 ## ⚙️ Background Script Command Reference
+
+All background commands execute the globally registered script (`~/.gemini/config/plugins/...`), enabling full functionality across any workspace repository:
 
 ### 1. Match Check Command
 Checks recent transcript or explicit inputs for matching cohort struggles:
 ```bash
-npx tsx skill-weave/scripts/skill-weave-agent.ts \
+npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts \
   --mode check \
   --type "[ERROR-CODE / FRUSTRATION]" \
   --struggle "[STRUGGLE_TEXT]" \
@@ -118,7 +153,7 @@ npx tsx skill-weave/scripts/skill-weave-agent.ts \
 ### 2. Detailed Peer Case Study View
 Generates `peer_workspace_case_study.md` inside `.t4g/skill-weave/` for a specific matched case:
 ```bash
-npx tsx skill-weave/scripts/skill-weave-agent.ts \
+npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts \
   --mode view-peer \
   --id "[PEER_CASE_ID]" \
   --workspace-root "<WORKSPACE_ROOT>"
@@ -127,7 +162,7 @@ npx tsx skill-weave/scripts/skill-weave-agent.ts \
 ### 3. Draft Review Card Command
 Generates `pending_struggle_log.md` inside `.t4g/skill-weave/` for a resolved struggle:
 ```bash
-npx tsx skill-weave/scripts/skill-weave-agent.ts \
+npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts \
   --mode draft-log \
   --transcript "[TRANSCRIPT_PATH]" \
   --id "[CONVERSATION_ID]" \
@@ -135,9 +170,9 @@ npx tsx skill-weave/scripts/skill-weave-agent.ts \
 ```
 
 ### 4. Database Committing Command
-Parses the user-reviewed file, applies corrections, and uploads the finalized struggle:
+Parses the user-reviewed file, applies corrections, and uploads the finalized struggle and chat phase:
 ```bash
-npx tsx skill-weave/scripts/skill-weave-agent.ts \
+npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts \
   --mode log \
   --file ".t4g/skill-weave/pending_struggle_log.md" \
   --workspace-root "<WORKSPACE_ROOT>"

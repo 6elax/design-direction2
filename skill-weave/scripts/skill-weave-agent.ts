@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
-import { join, resolve } from "path";
+import { join, resolve, basename } from "path";
 import { parseArgs } from "util";
+import { userInfo } from "os";
 
 const { positionals, values } = parseArgs({
   options: {
@@ -42,12 +43,15 @@ const projectId = process.env.FIREBASE_PROJECT_ID || "paci-e55e7";
 const STOP_WORDS = new Set([
   "the", "a", "an", "and", "or", "but", "if", "then", "else", "for", "to", "in", "on", "at", "by", 
   "from", "with", "about", "against", "of", "is", "are", "was", "were", "be", "been", "being", 
-  "have", "has", "had", "do", "does", "did", "can", "could", "should", "would", "will", "i", "we", 
-  "you", "he", "she", "they", "it", "this", "that", "these", "those"
+  "have", "has", "had", "do", "does", "did", "can", "could", "should", "would", "will", "shall",
+  "this", "that", "these", "those", "it", "its", "you", "your", "we", "our", "they", "their",
+  "what", "which", "who", "when", "where", "why", "how", "all", "any", "both", "each", "few",
+  "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than",
+  "too", "very", "s", "t", "just", "don", "shouldn", "now", "also", "think", "problem", "way", "sure"
 ]);
 
 const VALID_TYPES = new Set([
-  "SCOPING", "DESIGN-FRICTION", "THEORETICAL", "TECHNICAL", "HALLUCINATION", "METACOGNITIVE", "VALIDATION", "ERROR-CODE", "FRUSTRATION"
+  "CONTRADICTION", "THEORETICAL", "TECHNICAL", "HALLUCINATION", "METACOGNITIVE", "VALIDATION", "ERROR-CODE", "FRUSTRATION"
 ]);
 
 function getKeywords(text: string): string[] {
@@ -118,6 +122,23 @@ export function fromFirestoreDocument(doc: any): Record<string, any> {
     obj[k] = fromFirestoreValue(v);
   }
   return obj;
+}
+
+// Detect active user account name cross-platform
+export function getCurrentAuthor(): string {
+  let detected = process.env.SKILLWEAVE_AUTHOR || process.env.AUTHOR;
+  if (!detected) {
+    try {
+      const info = userInfo();
+      if (info && info.username) {
+        detected = info.username;
+      }
+    } catch (e) {}
+  }
+  if (!detected) {
+    detected = process.env.USER || process.env.USERNAME || process.env.LOGNAME || "builder";
+  }
+  return detected.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 // Format document keys as username-problem
@@ -276,11 +297,12 @@ export async function syncChatToFirestore(conversationId: string, author: string
     const updatedPhases = [...existingPhases, newPhaseValue];
 
     // Construct payload payload including metadata fields: project, topic, user
+    const projectName = process.env.PROJECT_NAME || basename(projectRoot) || "workspace";
     const chatDocPayload: Record<string, any> = {
       fields: {
         user: { stringValue: author.toLowerCase() },
         topic: { stringValue: topic },
-        project: { stringValue: "design-dir-2" },
+        project: { stringValue: projectName },
         phases: {
           arrayValue: {
             values: updatedPhases
@@ -644,7 +666,7 @@ ${dynamicDialogue}
     }
 
     // Dynamically query chats collection to find correct conversation ID link
-    const author = "alexis";
+    const author = getCurrentAuthor();
     
     let slug = `struggle-${Date.now()}`;
     if (roadblockText && roadblockText !== "The cohort member hit a steering bottleneck while updating the database environment configs.") {
