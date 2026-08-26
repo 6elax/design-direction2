@@ -773,17 +773,25 @@ ${dynamicDialogue}
 
 How can you design your settings to work smoothly across different environments?`;
 
-    const reviewContent = `# [SkillWeave: Review Your Resolved Struggle]
+    const projectName = process.env.PROJECT_NAME || basename(projectRoot) || "workspace";
+
+    const reviewContent = `<!--
+METADATA:
+author: ${author}
+type: TECHNICAL
+key: ${initialKey}
+conversation_id: ${conversationId}
+phase_index: ${phaseIndex}
+start_message_index: ${startMsgIndex}
+end_message_index: ${endMsgIndex}
+project: ${projectName}
+-->
+
+# [SkillWeave: Review Your Resolved Struggle]
 -------------------------------------------------------------
 * **Author**: ${author}
-* **Created At**: ${getLocalISOString()}
-* **Type**: TECHNICAL
-* **Key**: ${initialKey}
-* **Conversation ID**: ${conversationId}
-* **Phase Index**: ${phaseIndex}
-* **Start Message Index**: ${startMsgIndex}
-* **End Message Index**: ${endMsgIndex}
-* **Status**: Pending Approval (Review and commit to cohort database)
+* **Topic/Key**: \`${initialKey}\`
+* **Status**: ⏳ Pending Approval (Review below and click Proceed)
 
 ---
 
@@ -826,65 +834,85 @@ ${dialogueMock}
       }
       const content = readFileSync(filePath, "utf-8");
       
+      // 1. Parse Metadata from HTML comment block or visible bullets
+      let author = "unknown";
+      let type = "TECHNICAL";
+      let rawKey = `struggle-${Date.now()}`;
+      let conversationId = "00000000-0000-0000-0000-000000000000";
+      let phaseIndex = 0;
+      let startMsgIndex = 0;
+      let endMsgIndex = 0;
+      let parsedProject = basename(projectRoot);
+
+      const metadataMatch = content.match(/<!--\s*METADATA:([\s\S]*?)-->/i);
+      if (metadataMatch) {
+        for (const line of metadataMatch[1].split("\n")) {
+          const match = line.match(/^\s*([a-zA-Z0-9_]+)\s*:\s*(.*)$/);
+          if (match) {
+            const field = match[1].trim();
+            const val = match[2].trim();
+            if (field === "author") author = val.toLowerCase();
+            else if (field === "type") type = val.toUpperCase();
+            else if (field === "key") rawKey = val;
+            else if (field === "conversation_id") conversationId = val;
+            else if (field === "phase_index") phaseIndex = Number(val);
+            else if (field === "start_message_index") startMsgIndex = Number(val);
+            else if (field === "end_message_index") endMsgIndex = Number(val);
+            else if (field === "project") parsedProject = val;
+          }
+        }
+      }
+
+      // Fallback to visible bullets if not present in comment block
       const authorMatch = content.match(/\*\s*\*\*Author\*\*:\s*(.*)/i);
       const typeMatch = content.match(/\*\s*\*\*Type\*\*:\s*(.*)/i);
-      const keyMatch = content.match(/\*\s*\*\*Key\*\*:\s*(.*)/i);
+      const keyMatch = content.match(/\*\s*\*\*(?:Key|Topic\/Key)\*\*:\s*`?([^\n`]+)`?/i);
       const convMatch = content.match(/\*\s*\*\*Conversation ID\*\*:\s*(.*)/i);
       const phaseMatch = content.match(/\*\s*\*\*Phase Index\*\*:\s*(.*)/i);
       const startMatch = content.match(/\*\s*\*\*Start Message Index\*\*:\s*(.*)/i);
       const endMatch = content.match(/\*\s*\*\*End Message Index\*\*:\s*(.*)/i);
-      
-      const author = authorMatch ? authorMatch[1].trim().toLowerCase() : "unknown";
-      const type = typeMatch ? typeMatch[1].trim() : "TECHNICAL";
-      const rawKey = keyMatch ? keyMatch[1].trim() : `struggle-${Date.now()}`;
-      const conversationId = convMatch ? convMatch[1].trim() : "00000000-0000-0000-0000-000000000000";
-      const phaseIndex = phaseMatch ? Number(phaseMatch[1].trim()) : 0;
-      const startMsgIndex = startMatch ? Number(startMatch[1].trim()) : 0;
-      const endMsgIndex = endMatch ? Number(endMatch[1].trim()) : 0;
-      
+
+      if (author === "unknown" && authorMatch) author = authorMatch[1].trim().toLowerCase();
+      if (type === "TECHNICAL" && typeMatch) type = typeMatch[1].trim().toUpperCase();
+      if (rawKey.startsWith("struggle-") && keyMatch) rawKey = keyMatch[1].trim();
+      if (conversationId === "00000000-0000-0000-0000-000000000000" && convMatch) conversationId = convMatch[1].trim();
+      if (phaseIndex === 0 && phaseMatch) phaseIndex = Number(phaseMatch[1].trim());
+      if (startMsgIndex === 0 && startMatch) startMsgIndex = Number(startMatch[1].trim());
+      if (endMsgIndex === 0 && endMatch) endMsgIndex = Number(endMatch[1].trim());
+
       const key = formatStruggleKey(author, rawKey);
 
-      const sections = content.split(/## /);
+      // 2. Parse Content Sections with full Markdown preservation (code blocks, bold, diffs, newlines)
       let summary = "";
       let roadblock = "";
       let resolution = "";
       let dialogue_history = "";
-      
-      for (const section of sections) {
-        const lines = section.split("\n");
-        const heading = lines[0].trim();
-        const bodyLines = lines.slice(1);
-        
-        const cleanBody = bodyLines
-          .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:") && !line.trim().startsWith(">"))
-          .join("\n")
+
+      const rawSections = content.split(/^##\s+/m);
+      for (const section of rawSections) {
+        const firstNewline = section.indexOf("\n");
+        if (firstNewline === -1) continue;
+        const heading = section.slice(0, firstNewline).trim();
+        const body = section.slice(firstNewline + 1)
+          .replace(/<!--[\s\S]*?-->/g, "")
+          .replace(/^Comment:\s*.*$/gm, "")
           .trim();
-          
-        if (heading.includes("Summary")) {
-          const summaryStr = bodyLines
-            .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:"))
-            .join("\n")
-            .trim();
-          
-          const genSummaryMatch = summaryStr.match(/\*\*Summary\*\*:\s*([\s\S]*?)(?=\*\*Roadblock\*\*|$)/i);
-          const roadblockMatch = summaryStr.match(/\*\*Roadblock\*\*:\s*([\s\S]*?)(?=\*\*Resolution\*\*|$)/i);
-          const resolutionMatch = summaryStr.match(/\*\*Resolution\*\*:\s*([\s\S]*?)$/i);
-          
-          summary = genSummaryMatch ? genSummaryMatch[1].trim() : "";
-          roadblock = roadblockMatch ? roadblockMatch[1].trim() : (genSummaryMatch ? summaryStr.replace(genSummaryMatch[0], "").trim() : summaryStr);
-          resolution = resolutionMatch ? resolutionMatch[1].trim() : "";
-        } else if (heading.includes("Diffs") || heading.includes("Resolution")) {
-          const codeBlockMatch = cleanBody.match(/```diff([\s\S]*?)```/);
-          const rawRes = codeBlockMatch ? codeBlockMatch[1].trim() : cleanBody;
+
+        if (heading.includes("Summary") || heading.includes("Struggle Summary")) {
+          const summaryMatch = body.match(/\*\*Summary\*\*:\s*([\s\S]*?)(?=\n\s*\*\*Roadblock\*\*|\n\s*---|$)/i);
+          const roadblockMatch = body.match(/\*\*Roadblock\*\*:\s*([\s\S]*?)(?=\n\s*\*\*Resolution\*\*|\n\s*---|$)/i);
+          const resolutionMatch = body.match(/\*\*Resolution\*\*:\s*([\s\S]*?)(?=\n\s*---|$)/i);
+
+          if (summaryMatch) summary = summaryMatch[1].trim();
+          if (roadblockMatch) roadblock = roadblockMatch[1].trim();
+          if (resolutionMatch) resolution = resolutionMatch[1].trim();
+        } else if (heading.includes("Diffs") || heading.includes("Comparative Diffs")) {
           if (!resolution) {
-            resolution = rawRes;
+            resolution = body.replace(/\n\s*---\s*[\s\S]*$/, "").trim();
           }
-        } else if (heading.includes("Dialogue") || heading.includes("History")) {
-          const dialogLines = bodyLines
-            .filter(line => !line.trim().startsWith("<!--") && !line.trim().endsWith("-->") && !line.trim().startsWith("Comment:"))
-            .join("\n")
-            .trim();
-          dialogue_history = dialogLines;
+        } else if (heading.includes("Dialogue") || heading.includes("Verbatim Dialogue History")) {
+          const cleanDialogue = body.replace(/\n\s*---\s*\n\s*> \[!TIP\][\s\S]*$/, "").trim();
+          dialogue_history = cleanDialogue;
         }
       }
       
