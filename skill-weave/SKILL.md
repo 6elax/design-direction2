@@ -29,7 +29,7 @@ Would you like to see their code diffs/detailed case study? (Type "yes" or click
 
 ### Level 2: Detailed Workspace Pane (Right-Side Read-Only Artifact)
 If the user clicks `[🔍 Open Peer Workspace Pane]` or types "yes" in the chat, the agent creates a temporary, read-only Artifact file (`.t4g/skill-weave/peer_workspace_case_study.md`) which automatically loads in the right-side Artifacts panel. This displays comparative deltas and Socratic prompts:
-```markdown
+
 # [SkillWeave Workspace Pane]
 -------------------------------------------------------------
 
@@ -56,7 +56,6 @@ If the user clicks `[🔍 Open Peer Workspace Pane]` or types "yes" in the chat,
 > **Agent**: The auth.uid check only checks the uid string match. Custom claims are nested inside request.auth.token.
 
 **User**: Oh I see, I should check token.admin instead.
-```
 
 ### Level 3: Helpfulness Feedback (Native Multiple-Choice Question)
 Once the struggle is resolved, the assistant triggers the native IDE **Multiple-Choice Question (`ask_question`)** widget in the chat:
@@ -96,7 +95,10 @@ graph TD
 
 1. **Resolution Check Gating**: Once a struggle resolution is declared, the agent writes a small, temporary artifact `resolve_query.md` rendered on the right side:
    > *"I notice a struggle. Have you resolved it? Click **Proceed** to review and log, or close this card to ignore."*
-2. **NLU Synthesis**: Clicking **Proceed** triggers the agent to synthesize the conversation transcript and write it to `.t4g/skill-weave/pending_struggle_log.md` (which is added to `.gitignore`).
+2. **NLU Synthesis**: Clicking **Proceed** triggers the agent to synthesize the conversation transcript and write it to `.t4g/skill-weave/pending_struggle_log.md` (which is added to `.gitignore`). The review card must follow these strict formatting guidelines:
+   *   **Brief Non-Technical Summary**: The summary field must be a short, jargon-free paragraph describing the challenge and resolution in general terms, ending with exactly one Socratic question on a new line.
+   *   **Clean Dialogue History**: Must consist strictly of alternating User (`**User**:`) and Agent (`> **Agent**:`) turns, with formatting (newlines/indentation) preserved. All system messages, tool execution logs, compiler logs, and command outputs must be excluded so the review card content matches the Firestore upload payload exactly.
+   *   **Descriptive Slugs**: The struggle key must be formatted as `author-description` slugified from the first 4-5 keywords of the roadblock, avoiding random timestamps.
 3. **Collaborative Comment Gating**: On Antigravity 2.0, the artifact is read-only. The user leaves inline comments directly on the artifact (or chats corrections to the agent), and then clicks **Proceed**. The agent reads the comments, updates the file contents, and commits the finalized log to Firebase Firestore.
 
 ---

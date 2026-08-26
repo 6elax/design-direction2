@@ -565,20 +565,41 @@ ${dynamicDialogue}
     try {
       transcriptText = readFileSync(transcriptPath, "utf-8");
       const lines = transcriptText.split("\n");
-      const entries = [];
       
+      const isMetaResponse = (content: string) => {
+        const lower = content.toLowerCase();
+        return (
+          lower.startsWith("i will launch") ||
+          lower.startsWith("i will wait") ||
+          lower.startsWith("i will run") ||
+          lower.startsWith("i will trigger") ||
+          lower.startsWith("i will execute") ||
+          lower.includes("reflection subagent") ||
+          lower.includes("subagents will send you a message") ||
+          lower.includes("completed the reflection task")
+        );
+      };
+
+      const chatEntries = [];
       for (const line of lines) {
         if (!line.trim()) continue;
         try {
-          entries.push(JSON.parse(line));
+          const entry = JSON.parse(line);
+          if (entry.type === "USER_INPUT") {
+            chatEntries.push(entry);
+          } else if (entry.type === "PLANNER_RESPONSE") {
+            if (!isMetaResponse(entry.content || "")) {
+              chatEntries.push(entry);
+            }
+          }
         } catch (e) {}
       }
 
       let startIndex = -1;
       let endIndex = -1;
 
-      for (let i = entries.length - 1; i >= 0; i--) {
-        const entry = entries[i];
+      for (let i = chatEntries.length - 1; i >= 0; i--) {
+        const entry = chatEntries[i];
         if (entry.type === "USER_INPUT") {
           const text = (entry.content || "").toLowerCase();
           if (text.includes("/resolved") && endIndex === -1) {
@@ -593,10 +614,10 @@ ${dynamicDialogue}
 
       let targetEntries = [];
       if (endIndex !== -1) {
-        const start = startIndex !== -1 ? Math.max(0, startIndex - 5) : Math.max(0, endIndex - 10);
-        targetEntries = entries.slice(start, endIndex + 2);
+        const start = startIndex !== -1 ? Math.max(0, startIndex - 4) : Math.max(0, endIndex - 8);
+        targetEntries = chatEntries.slice(start, endIndex + 2);
       } else {
-        targetEntries = entries.slice(Math.max(0, entries.length - 12));
+        targetEntries = chatEntries.slice(Math.max(0, chatEntries.length - 10));
       }
 
       const formattedLines = [];
@@ -624,7 +645,21 @@ ${dynamicDialogue}
 
     // Dynamically query chats collection to find correct conversation ID link
     const author = "alexis";
-    const initialKey = formatStruggleKey(author, `struggle-${Date.now()}`);
+    
+    let slug = `struggle-${Date.now()}`;
+    if (roadblockText && roadblockText !== "The cohort member hit a steering bottleneck while updating the database environment configs.") {
+      const cleanWords = roadblockText.toLowerCase()
+        .replace(/<[^>]*>/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !STOP_WORDS.has(w))
+        .slice(0, 4);
+      if (cleanWords.length > 0) {
+        slug = cleanWords.join("-");
+      }
+    }
+    
+    const initialKey = formatStruggleKey(author, slug);
     const conversationId = await findMatchingChatId(author, initialKey, "TECHNICAL", transcriptText);
     
     // Dynamically search the Firestore chat log phases and messages to find the exact matching range
@@ -712,7 +747,9 @@ ${dynamicDialogue}
     }
 
     // Pre-written generalized summary by the agent ending in exactly 1 general Socratic question on a new line
-    const summaryText = "Faced a bottleneck while trying to configure project settings, and resolved it by replacing hardcoded paths with a dynamic variable parameter to make configuration checks flexible.\\n\\nHow can you parameterize your environment configurations to support multiple runtime settings?";
+    const summaryText = `Faced a challenge when setting up project paths and resolved it by making the configuration dynamic and flexible to adapt to different locations.
+
+How can you design your settings to work smoothly across different environments?`;
 
     const reviewContent = `# [SkillWeave: Review Your Resolved Struggle]
 -------------------------------------------------------------

@@ -46,7 +46,6 @@ To pre-populate the cloud database with the baseline peer struggle analysis data
 ### Step 4: Hook the Skill into Chat Agent Rules
 To make the AI agent run SkillWeave automatically behind the scenes of every chat turn, hook it into your project's agent rules file (e.g. `.cursorrules`, `.gemini/rules.md`, or your workspace `rules.md`):
 
-```markdown
 ## Antigravity SkillWeave Trigger Rules
 
 ### 🔒 Chat Logging & Privacy Policy
@@ -54,10 +53,10 @@ To respect builder privacy, general conversation history is tracked strictly **o
 
 At the end of every conversational turn:
 1. **Command: /search [query]**: If the user types `/search [query]`, the agent must run the check command:
-   `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode check --struggle "[QUERY]" --workspace-root "<project-root>"`
+   `npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts --mode check --struggle "[QUERY]" --workspace-root "<project-root>"`
    It displays the Socratic query results directly in the chat, and offers to open the peer workspace pane. When the peer workspace pane is opened (`--mode view-peer`), the active agent must dynamically generate 2 custom Socratic pivot questions bridging the peer roadblock/resolution with the current user's specific struggle context, and replace the placeholder section in the generated markdown file.
 2. **Command: /stuck**: If the user types `/stuck` or if the telemetry watcher intercepts a high-friction struggle (e.g. 3 consecutive compile errors or prompt reversions), the agent must:
-   - Run the validation check: `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode validate-stuck --transcript "[TRANSCRIPT]" --workspace-root "<project-root>"`
+   - Run the validation check: `npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts --mode validate-stuck --transcript "[TRANSCRIPT]" --workspace-root "<project-root>"`
    - If the check returns code `1` (blocked) and the command had no description arguments:
      - Print the pushback message: *"I don't notice any compilation errors or struggle patterns in our recent dialogue. If you are stuck on a conceptual design or planning task, please type `/stuck [brief description of your roadblock]` to tag this struggle."*
    - If the check passes (exits code `0`) or the user provided a description argument (e.g. `/stuck [description]`):
@@ -70,14 +69,14 @@ At the end of every conversational turn:
    - If the block is valid (at least 2 exchanges):
      - Trigger the `/save-chat-transcript` utility skill to extract the offline conversation logs.
      - Run NLU synthesis to extract the Summary (generalized plain-language overview), Roadblock, and Resolution from the local transcript buffer.
-     - Run: `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode draft-log --transcript "[TRANSCRIPT]" --id "[CONVERSATION_ID]" --workspace-root "<project-root>"` to generate `.t4g/skill-weave/pending_struggle_log.md`.
+     - Run: `npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts --mode draft-log --transcript "[TRANSCRIPT]" --id "[CONVERSATION_ID]" --workspace-root "<project-root>"` to generate `.t4g/skill-weave/pending_struggle_log.md`.
      - Extract the specific dialogue turns (user messages and agent responses) that directly show the roadblock and how it was resolved, and overwrite the `## 🎙️ Verbatim Dialogue History` section in `.t4g/skill-weave/pending_struggle_log.md` with this focused context.
      - Write the finalized contents of the drafted log directly to the conversation's active artifact directory under the filename `pending_struggle_log.md` using the `write_to_file` tool with `RequestFeedback: true` set in the `ArtifactMetadata`.
      - Print a prompt in the chat: *"I've generated your review card on the right side. Leave comments for edits, and click Proceed when ready."*
 4. **Approve / Proceed**: When the user clicks **Proceed** on the `pending_struggle_log.md` Artifact:
    - Read the file content and apply any comments left by the user.
    - Run the log command to upload to Firebase Firestore:
-     `npx tsx skill-weave/scripts/skill-weave-agent.ts --mode log --file ".t4g/skill-weave/pending_struggle_log.md" --workspace-root "<project-root>"`
+     `npx tsx ~/.gemini/config/plugins/agent-learning/skills/skillweave/scripts/skill-weave-agent.ts --mode log --file ".t4g/skill-weave/pending_struggle_log.md" --workspace-root "<project-root>"`
 
 ## Telemetry Watcher Activation Hooks
 
@@ -87,7 +86,6 @@ In addition to manual commands, the background telemetry watchers automatically 
    - Prompt: *"💡 I notice some repetitive compilation errors in your workspace. If you are blocked on this task, type `/stuck` to query the cohort database or flag this roadblock."*
 2. **Semantic Frustration / Repetition Watcher**: Triggers if the user's message contains repeated friction indicators (e.g., "keeps doing X", "not working", "same problem") or if the same URL/task/symbol is re-attempted unsuccessfully across 2 turns.
    - Prompt: *"It looks like we're hitting repeated friction trying to [describe task/error, e.g., route to /onboarding?step=3]. Would you like to tag this struggle with `/stuck` to check how peers solved this?"*
-```
 
 ---
 
